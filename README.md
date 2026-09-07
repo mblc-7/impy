@@ -2,10 +2,10 @@
 
 Make Python easy to manage
 
-## Minimum Requirements
+## Minimum Requirements to Run ImPy
 
 * Windows XP+ (recommend Windows 10+)
-* x64 and ARM64
+* x64 or ARM64
 
 ## Guides
 
