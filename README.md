@@ -21,7 +21,6 @@ Make Python easy to manage
   * `cpt.bat`
   * `locmap.json`
 
-### Steps
 
 ### Prepare
 
@@ -38,7 +37,7 @@ Make Python easy to manage
   pip install nuitka
   ```
 
-#### Compile
+### Compile
 
 Copy these down and paste to Command Prompt to run it:
 
@@ -65,7 +64,7 @@ nuitka --standalone ^
     impy.py
 ```
 
-#### Make up a setup
+### Make up a setup
 
 Copy these down and paste to Command Prompt to run it:
 
