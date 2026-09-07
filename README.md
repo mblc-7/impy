@@ -72,7 +72,7 @@ Copy these down and paste to Command Prompt to run it:
 ISCC impy.iss
 ```
 
-**NOTE: **if you want to test the setup, copy these down and paste to Command Prompt to run it:
+**NOTE:** if you want to test the setup, copy these down and paste to Command Prompt to run it:
 
 ```Batchfile
 start .\Output\ImPy-%version%-x64.exe
