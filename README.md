@@ -13,7 +13,7 @@ Make Python easy to manage
 
 * Windows x64
 * Python 3.10+
-* Inno Setup
+* Inno Setup 7
 * Files in repository:
   * `impy.py`
   * `impy.iss`
@@ -23,28 +23,28 @@ Make Python easy to manage
 
 ### Steps
 
-Firstly, make sure your current work directory which you put all the required files in repository.
+### Prepare
 
-```Batchfile
-cd DirectoryHere
-```
+* make sure your current work directory which you put all the required files in repository.
+  ```Batchfile
+  cd %impyfolder%
+  ```
+  (change `%impyfolder%` to your actual directory)
+* make sure you add these to `%PATH%`:
+  * `%LocalAppData%\Programs\Python31X\Scripts` (change `Python31X` to your actual Python folder)
+  * `C:\PROGRA~1\Inno Setup 7` (make sure you are using Inno Setup 7)
+* install Nuitka
+  ```Batchfile
+  pip install nuitka
+  ```
 
-Secondly, make sure you had added `%LOCALAPPDATA%\Programs\Python31X\Scripts` in `%PATH%`.
+#### Compile
 
-If you haven't install Nuitka yet, write:
-
-```Batchfile
-pip install nuitka
-```
-
-Then copy these down:
-First phrase:
+Copy these down and paste to Command Prompt to run it:
 
 ```Batchfile
 set version=26.1.2
 ```
-
-Second phrase:
 
 ```Batchfile
 nuitka --standalone ^
@@ -62,5 +62,19 @@ nuitka --standalone ^
     --windows-icon-from-ico=impy.ico ^
     --include-data-files=cpt.bat=cpt.bat ^
     --include-data-files=locmap.json=locmap.json ^
-    impy.py && ^
+    impy.py
+```
+
+#### Make up a setup
+
+Copy these down and paste to Command Prompt to run it:
+
+```Batchfile
+ISCC impy.iss
+```
+
+**NOTE: **if you want to test the setup, copy these down and paste to Command Prompt to run it:
+
+```Batchfile
+start .\Output\ImPy-%version%-x64.exe
 ```
