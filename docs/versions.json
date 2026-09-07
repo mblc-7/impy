@@ -2,8 +2,8 @@
     "meta": 202609061226,
     "update": {
         "dev": "",
-        "new": "26.1.1",
-        "compate": [],
+        "new": "26.1.2",
+        "compate": ["26.1.1"],
         "expires": ["26.1"]
     },
     "credits": {
