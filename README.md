@@ -15,6 +15,8 @@ Make Python easy to manage
 
 ## Language Supports
 
+(Emm... the author only learnt Simplified Chinese, Traditional Chinese and English, next maybe Spanish or German)
+
 * ImPy 支持简体中文！
 * ImPy 支援正體中文！
 * ImPy supports English!
