@@ -1,7 +1,7 @@
 [Setup]
 AppName=ImPy
-AppVersion=26.1.1
-VersionInfoVersion=26.1.1.0
+AppVersion=26.1.2
+VersionInfoVersion=26.1.2.0
 AppPublisher=MBLC7
 AppCopyright=Copyright (C) 2026 MBLC7
 DefaultDirName={commonpf}\ImPy
