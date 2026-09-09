@@ -1,4 +1,4 @@
-<img src="impy.svg" width="110dp" height="110dp">
+<img src="impy.svg" width="110dp" height="110dp">&emsp;<img src="impy-text.svg" width="145px" height="145px">
 
 # ImPy
 
