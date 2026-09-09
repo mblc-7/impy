@@ -1,3 +1,5 @@
+<img src="impy.svg" width="110dp" height="110dp">
+
 # ImPy
 
 Make Python easy to manage
