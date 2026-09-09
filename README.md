@@ -7,7 +7,10 @@ Make Python easy to manage
 
 ## Minimum Requirements to Run ImPy
 
-* Windows XP+ (recommend Windows 10+)
+> [!NOTE]
+> If you want to run it in Windows XP, try [One-Core-API](https://github.com/shorthorn-project/One-Core-API-Binaries)!
+
+* Windows Vista+ (recommend Windows 10+)
 * x64 or ARM64
 
 ## Guides
