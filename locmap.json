@@ -240,9 +240,9 @@
     },
 
     "uninstpy": {
-        "zh_CN": "卸载 Python (--uninstall 也行)",
-        "zh_TW": "解除安裝 Python (--uninstall 也行)",
-        "en_US": "Uninstall Python (or --uninstall)"
+        "zh_CN": "卸载 Python",
+        "zh_TW": "解除安裝 Python",
+        "en_US": "Uninstall Python"
     },
 
     "insted": {
@@ -276,8 +276,8 @@
     },
 
     "runpyw": {
-        "zh_CN": "运行无窗口的 Python",
-        "zh_TW": "執行無窗口的 Python",
+        "zh_CN": "运行无控制台的 Python",
+        "zh_TW": "執行無控制臺的 Python",
         "en_US": "Run Python with no window"
     },
 
@@ -378,9 +378,9 @@
     },
 
     "lsvap": {
-        "zh_CN": "版本\t架构\t路径\n-------\t----\t----",
-        "zh_TW": "版本\t架構\t路徑\n-------\t----\t----",
-        "en_US": "Version\tArch\tPath\n-------\t----\t----"
+        "zh_CN": "版本\t架构\t默认\t路径\n-------\t----\t-------\t----",
+        "zh_TW": "版本\t架構\t默認\t路徑\n-------\t----\t-------\t----",
+        "en_US": "Version\tArch\tDefault\tPath\n-------\t----\t-------\t----"
     },
 
     "relsuc": {
@@ -413,6 +413,24 @@
         "en_US": " (Security)"
     },
 
+    "brklat": {
+        "zh_CN": " (最新版本)",
+        "zh_TW": " (最新版本)",
+        "en_US": " (Latest)"
+    },
+
+    "brkdef": {
+        "zh_CN": "√ 是",
+        "zh_TW": "√ 是",
+        "en_US": "√ Yes"
+    },
+
+    "brkndef": {
+        "zh_CN": "× 否",
+        "zh_TW": "× 否",
+        "en_US": "× No"
+    },
+
     "pywterr": {
         "zh_CN": "不可以创建一个无窗口的自由线程构建！请尝试 \"impy py {}\" ！",
         "zh_TW": "不可以創建一個無窗口的自由綫程構建！請嘗試 \"impy py {}\" ！",
@@ -423,5 +441,35 @@
         "zh_CN": "总共 {} 个版本",
         "zh_TW": "總共 {} 個版本",
         "en_US": "{} version in total"
+    },
+
+    "setdefsuc": {
+        "zh_CN": "成功将 {} 设置为默认的 Python！",
+        "zh_TW": "成功將 {} 設定為默認的 Python！",
+        "en_US": "Successfully set {} as the default Python!"
+    },
+
+    "setdef": {
+        "zh_CN": "设置默认的 Python",
+        "zh_TW": "設定默認的 Python",
+        "en_US": "Set default Python"
+    },
+
+    "addpy": {
+        "zh_CN": "添加一个已安装但是不在列表里的 Python",
+        "zh_TW": "添加一個已安裝但是不在列表裏的 Python",
+        "en_US": "Add a installed Python but not in the list"
+    },
+
+    "addpysuc": {
+        "zh_CN": "添加成功！",
+        "zh_TW": "添加成功！",
+        "en_US": "Add success!"
+    },
+
+    "invpath": {
+        "zh_CN": "无效路径！",
+        "zh_TW": "無效路徑！",
+        "en_US": "Invalid path!"
     }
 }

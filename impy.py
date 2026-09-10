@@ -1,3 +1,6 @@
+cincl = ["Python 3.14.7", "Inno Setup 7.1.0", "LLVM 23.1.1", "GCC 16.1.0", "Firefox 155.0"]
+
+from winreg import OpenKey, SetValueEx, CloseKey, QueryValueEx, REG_EXPAND_SZ, KEY_READ, KEY_WRITE, HKEY_CURRENT_USER
 from locale import getdefaultlocale
 from sys import exit, getwindowsversion, argv, stdout
 from platform import machine
@@ -29,6 +32,9 @@ except:
 
 def trans(id: str) -> str:
     return locmap[id][loc]
+
+def trgb(content, red, green, blue) -> str:
+    return f"\033[38;2;{red};{green};{blue}m{content}\033[0m"
 
 if machine().lower() not in ["amd64", "arm64"]:
     print(f"\033[0;33m{trans("unsarch")}{machine()}\033[0m")
@@ -68,10 +74,27 @@ homepath = localprograms / "ImPy"
 homepath.mkdir(exist_ok = True)
 setups = homepath / "pythons"
 setups.mkdir(exist_ok = True)
-impt = "26.1.2"
+impt = "26.1.4"
+
+impyascii = f"""         {trgb("----:----==+", 0, 128, 128)}         
+        {trgb("==  -----===++", 0, 128, 128)}        
+        {trgb("====---====+++", 0, 128, 128)}        
+               {trgb("===++++", 0, 128, 128)}        
+ {trgb(" *****+++++===++++++*", 0, 128, 128)} {trgb("======", 255, 215, 0)} 
+{trgb("*********++++++++++***", 0, 128, 128)} {trgb("=======", 255, 215, 0)}
+{trgb("************++++******", 0, 128, 128)} {trgb("=======", 255, 215, 0)}
+{trgb("*********", 0, 128, 128)}            {trgb("======+++", 255, 215, 0)}
+{trgb("*******", 0, 128, 128)} {trgb("+=============++++++++", 255, 215, 0)}
+{trgb("*******", 0, 128, 128)} {trgb("++++++++++++++++++++++", 255, 215, 0)}
+ {trgb("******", 0, 128, 128)} {trgb("++++++++++++++++++++", 255, 215, 0)}  
+        {trgb("+++++++", 255, 215, 0)}               
+        {trgb("++++++++++++++", 255, 215, 0)}        
+        {trgb("++++++++++  ++", 255, 215, 0)}        
+         {trgb("++++++++++++", 255, 215, 0)}         
+"""
 
 header = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 AppleWebKit/605.1.15 (KHTML, like Gecko) Firefox/157.0 Chrome/154.0.8037.0 OPR/137.0.6010.1",
+    "User-Agent": f"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0 ImPy/{impt}",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.5",
     "Accept-Encoding": "gzip, deflate, br",
@@ -87,13 +110,15 @@ def writemanage(
         version: str,
         pypath: str,
         arch: str = "x64",
-        adds: bool = True
+        adds: bool = True,
+        isdef: bool = False
     ):
     pypath = str(pypath)
     creator = {
         version: {
             "arch": arch,
-            "path": pypath
+            "path": pypath,
+            "default": isdef
         }
     }
     whereisjson: Path = homepath / "manage.json"
@@ -256,7 +281,7 @@ def install(
             else:
                 print(trans("instsuc"))
             whereisver = localprograms / "Python" / pythonfolder
-            writemanage(pyver, whereisver, "x64", adds)
+            writemanage(pyver, whereisver, "x64", adds, True)
             exit(0)
         case 1223 | 1602:
             print(f"\033[0;31m{trans("instcancel")}\033[0m")
@@ -389,19 +414,20 @@ if __name__ == "__main__":
             print(f"\t\t-s\t{trans("skipeol")}")
             print(f"\t(V)\t{trans("instpy")}")
             print(f"\t(V)t\t{trans("insthread")}")
-            print(f"\t(V) -u\t{trans("uninstpy")}")
+            print(f"uninst\t{trans("uninstpy")}")
             print(f"list\t{trans("insted")}")
+            print(f"setdef\t{trans("setdef")}")
+            print(f"add\t{trans("addpy")}")
             print(f"del\t{trans("rminst")}")
             print(f"\t(V)\t{trans("rminst")}")
-            print(f"py\t{trans("runpy")} ({trans("like")} \"impy py 3.13 -m pip install pygame\")")
+            print(f"py\t{trans("runpy")} ({trans("like")} \"impy py 3.14 main.py\")")
             print(f"\t(V)\t{trans("runpy")}")
             print(f"\t(V)t\t{trans("runpyt")}")
-            print(f"pyw\t{trans("runpyw")} ({trans("like")} \"impy pyw 3.13 -m pip install pygame\")")
+            print(f"pyw\t{trans("runpyw")} ({trans("like")} \"impy pyw 3.14 main.py\")")
             print(f"\t(V)\t{trans("runpyw")}")
 
         case "about":
-            print(f"ImPy {impt} [Inno Setup 7.1.0, MSVC 19.51.36256, Python 3.13.15]\n{trans("copy")}")
-            print("")
+            print(f"ImPy {impt}\n[ {", ".join(cincl)} ]\n{trans("copy")}\n{impyascii}")
 
         case "upd":
             old = getjson()
@@ -489,16 +515,9 @@ if __name__ == "__main__":
                 if v not in syn:
                     print(f"\033[0;31m{trans("unkver")}\033[0m")
                     exit(1)
-                fn = f"python-{v}-amd64.exe"
-                shouldfn = setups / fn
-                ques: bool = True
-                uninst: bool = False
+                shouldfn = setups / f"python-{v}-amd64.exe"
                 try:
                     match args[2:]:
-                        case x if "--uninstall" in x or "-u" in x:
-                            switch = " /uninstall"
-                            uninst = True
-                            ques = False
                         case x if tswit:
                             switch = " /passive Include_pip=1 Include_freethreaded=1"
                         case _:
@@ -523,9 +542,47 @@ if __name__ == "__main__":
                     {},
                     None,
                     f"Python {spec}",
-                    ques,
-                    uninst
+                    True,
+                    False
                 )
+
+        case "uninst":
+            old = getjson()
+            try:
+                v = args[1]
+            except IndexError:
+                print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                exit(1)
+            tswit = v.endswith("t")
+            v = v.removesuffix("t") if v.endswith("t") else v
+            syn = old["eol"] + old["security"] + old["active"]
+
+            v = old["alias"][v] if v in old["alias"] else v
+            if v not in syn:
+                print(f"\033[0;31m{trans("unkver")}\033[0m")
+                exit(1)
+            shouldfn = setups / f"python-{v}-amd64.exe"
+
+            if v in old["eol"]:
+                spec = v + trans("brkeol")
+            elif v in old["security"]:
+                spec = v + trans("brksec")
+            else:
+                spec = v
+
+            insturl = getjson("route.json")["python"][v]
+            install(
+                insturl,
+                shouldfn,
+                " /uninstall",
+                v,
+                f"Python{v.split(".")[0]}{v.split(".")[1]}",
+                {},
+                None,
+                f"Python {spec}",
+                False,
+                True
+            )
 
         case "list":
             whereisjson: Path = homepath / "manage.json"
@@ -554,11 +611,19 @@ if __name__ == "__main__":
                     p = c[i]["path"]
                 except KeyError:
                     p = "?"
+
+                try:
+                    d = f"\033[0;32m{trans("brkdef")}\033[0m" if c[i]["default"] else f"\033[0;31m{trans("brkndef")}\033[0m"
+                except KeyError:
+                    d = "?"
+
+                isdef = c[i]["default"]
+                
                 if len(i) > 7:
-                    print(f"{i[:6]}-\t{a}\t{p}")
+                    print(f"{i[:6]}-\t{a}\t{d}\t{p}")
                     print(i[6:])
                 else:
-                    print(f"{i}\t{a}\t{p}")
+                    print(f"{i}\t{a}\t{d}\t{p}")
 
                 n += 1
 
@@ -605,6 +670,99 @@ if __name__ == "__main__":
                     spec = v
                 remove(str(instr), trans("instofpy").format(spec))
 
+        case "setdef":
+            old = getjson()
+            whereisjson: Path = homepath / "manage.json"
+            if not whereisjson.exists():
+                print(f"\033[0;31m{trans("instst")}\033[0m")
+                exit(1)
+
+            try:
+                v = args[1]
+            except IndexError:
+                print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                exit(1)
+
+            v = old["alias"][v] if v in old["alias"] else v
+
+            with open(whereisjson, "r", encoding = "utf-8") as f:
+                c: dict = load(f)
+            if c == {} or v not in c.keys():
+                print(f"\033[0;31m{trans("ferr")}\033[0m")
+                exit(1)
+
+            regk = OpenKey(
+                HKEY_CURRENT_USER,
+                r"Environment",
+                0,
+                KEY_READ | KEY_WRITE
+            )
+
+            try:
+                cpath, dtype = QueryValueEx(regk, "Path")
+
+            except FileNotFoundError:
+                cpath = ""
+                dtype = REG_EXPAND_SZ
+
+            cpathls = cpath.split(";")
+            if "" in cpathls:
+                while cpathls.count("") != 0:
+                    cpathls.remove("")
+            ks = list(c.keys())
+            ks.remove(v)
+            for k in ks:
+                pstr = c[k]["path"]
+                pscripts = rf"{pstr}\Scripts"
+                while pstr in cpathls or pscripts in cpathls:
+                    if pstr in cpathls and pscripts in cpathls:
+                        cpathls.remove(pstr)
+                        cpathls.remove(pscripts)
+                    elif pstr in cpathls:
+                        cpathls.remove(pstr)
+                    elif pscripts in cpathls:
+                        cpathls.remove(pscripts)
+                    else:
+                        break
+                writemanage(k, pstr, "x64")
+
+            if c[v]["path"] in cpathls:
+                if rf"{c[v]["path"]}\Scripts" in cpathls:
+                    ...
+                else:
+                    cpathls = [rf"{c[v]["path"]}\Scripts"] + cpathls
+            elif rf"{c[v]["path"]}\Scripts" in cpathls:
+                ...
+            else:
+                cpathls = [c[v]["path"], rf"{c[v]["path"]}\Scripts"] + cpathls
+            
+            cpath = ";".join(i for i in cpathls)
+            SetValueEx(regk, "Path", 0, REG_EXPAND_SZ, cpath)
+            CloseKey(regk)
+
+            writemanage(v, c[v]["path"], "x64", True, True)
+
+            print(trans("setdefsuc").format(v))
+
+        case "add":
+            old = getjson()
+            try:
+                v = args[1]
+                p = args[2]
+            except IndexError:
+                print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                exit(1)
+
+            v = old["alias"][v] if v in old["alias"] else v
+            python = Path(p) / "python.exe"
+            pythonw = Path(p) / "pythonw.exe"
+
+            if python.exists() and pythonw.exists():
+                writemanage(v, p)
+                print(trans("addpysuc"))
+            else:
+                print(f"\033[0;31m{trans("invpath")}\033[0m")
+        
         case _:
             print(f"\033[0;31m{trans("invsyn")}\033[0m")
             exit(1)
