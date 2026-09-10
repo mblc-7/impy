@@ -1,5 +1,5 @@
-<img src="impy.svg" width="110dp" height="110dp">&emsp;<img src="impy-text.svg" width="145px" height="145px"><br><br>
-<img src="impy-dev.svg" width="110dp" height="110dp">&emsp;<img src="impy-dev-text.svg" width="275px" height="290px">
+<img src="assets/impy.svg" width="110dp" height="110dp">&emsp;<img src="assets/impy-text.svg" width="145px" height="145px"><br><br>
+<img src="assets/impy-dev.svg" width="110dp" height="110dp">&emsp;<img src="assets/impy-dev-text.svg" width="275px" height="290px">
 
 # ImPy
 
