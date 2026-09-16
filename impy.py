@@ -1,14 +1,43 @@
-cincl = ["Python 3.14.7", "Inno Setup 7.1.0", "LLVM 23.1.1", "GCC 16.1.0", "Firefox 155.0"]
-
+from winapi import (CreateProcessW, STARTUPINFOW, PROCESS_INFORMATION, L, et,
+                      DWORD, WinError, WaitForSingleObject, INFINITY, GetExitCodeProcess,
+                      CloseHandle, DeleteFileW, CreateDirectoryW, PathFileExistsW)
 from winreg import OpenKey, SetValueEx, CloseKey, QueryValueEx, REG_EXPAND_SZ, KEY_READ, KEY_WRITE, HKEY_CURRENT_USER
 from locale import getdefaultlocale
 from sys import exit, getwindowsversion, argv, stdout
 from platform import machine
 from json import dump, load, JSONDecodeError
+from os.path import expandvars
 
 stdout.reconfigure(line_buffering = True)
-loc = getdefaultlocale()[0]
-loc = "en_US" if loc not in ["en_US", "zh_CN", "zh_TW"] else loc
+
+def mkdir(path) -> None:
+    if PathFileExistsW(L(path)):
+        return
+    CreateDirectoryW(L(path), None)
+
+homeurl = "https://mblc-7.github.io/impy"
+localprograms = expandvars(r"%LocalAppData%\Programs")
+homepath = rf"{localprograms}\ImPy"
+mkdir(homepath)
+setups = rf"{homepath}\python"
+mkdir(setups)
+impt = "26.1.6"
+cincl = ["Python 3.14.7", "Inno Setup 7.1.0", "CL 19.51.36257"]
+config = rf"{homepath}\config.json"
+
+if not PathFileExistsW(L(config)):
+    with open(config, "w") as f:
+        dump({"lang": None}, f, indent = 4)
+
+with open(config, "r") as f:
+    configcontent: dict = load(f)
+
+    if configcontent["lang"] is None:
+        loc = getdefaultlocale()[0]
+        loc = "en_US" if loc not in ["en_US", "zh_CN", "zh_TW"] else loc
+
+    else:
+        loc = configcontent["lang"]
 
 try:
     with open("locmap.json", "r", encoding = "utf-8") as lm:
@@ -30,8 +59,8 @@ except:
     print("\033[0;31mUnknown error: locmap.json\033[0m")
     exit(1)
 
-def trans(id: str) -> str:
-    return locmap[id][loc]
+def trans(id: str, i18n: str = loc) -> str:
+    return locmap[id][i18n]
 
 def trgb(content, red, green, blue) -> str:
     return f"\033[38;2;{red};{green};{blue}m{content}\033[0m"
@@ -61,20 +90,9 @@ match (v.major, v.minor, v.build):
         print(f"\033[0;31m{trans("winverinvalid")}\033[0m")
         exit(1)
 
-from winapi import (CreateProcessW, STARTUPINFOW, PROCESS_INFORMATION, L, et,
-                      DWORD, WinError, WaitForSingleObject, INFINITY, GetExitCodeProcess,
-                      CloseHandle, DeleteFileW)
 from niquests import get, exceptions
-from pathlib import Path
 
 args = argv[1:]
-localprograms = Path.home() / "AppData" / "Local" / "Programs"
-homeurl = "https://mblc-7.github.io/impy"
-homepath = localprograms / "ImPy"
-homepath.mkdir(exist_ok = True)
-setups = homepath / "pythons"
-setups.mkdir(exist_ok = True)
-impt = "26.1.4"
 
 impyascii = f"""         {trgb("----:----==+", 0, 128, 128)}         
         {trgb("==  -----===++", 0, 128, 128)}        
@@ -121,8 +139,8 @@ def writemanage(
             "default": isdef
         }
     }
-    whereisjson: Path = homepath / "manage.json"
-    if whereisjson.exists():
+    whereisjson = rf"{homepath}\manage.json"
+    if PathFileExistsW(L(whereisjson)):
         with open(whereisjson, "r", encoding = "utf-8") as f:
             orig: dict = load(f)
 
@@ -141,9 +159,9 @@ def writemanage(
                 dump({}, f, indent = 4)
 
 def getjson(jsonnm: str = "versions.json"):
-    where = homepath / jsonnm
+    where = rf"{homepath}\{jsonnm}"
     wjson = f"{homeurl}/{jsonnm}"
-    if where.exists():
+    if PathFileExistsW(L(where)):
         with open(where, "r", encoding = "utf-8") as f:
             old = load(f)
         
@@ -182,12 +200,11 @@ def getjson(jsonnm: str = "versions.json"):
 
 def download(
         url: str,
-        filename: str | Path,
-        params: dict = {},
+        filename: str,
         timeout: int | None = None,
     ) -> int | None:
     try:
-        with get(url, params = params, headers = header, timeout = timeout, stream = True) as r:
+        with get(url, params = {}, headers = header, timeout = timeout, stream = True) as r:
             if r.ok:
                 with open(filename, "wb") as f:
                     for chunk in r.iter_content(5242880):
@@ -241,22 +258,21 @@ def pysetup(
 
 def install(
         url: str,
-        filename: Path,
+        filename: str,
         switch: str = "",
         pyver: str = "3",
         pythonfolder: str = "Python3",
-        params: dict = {},
         timeout: int | None = None,
         info: str | None = None,
         adds: bool = True,
         uninst: bool = False
     ) -> None:
-    if filename.exists():
+    if PathFileExistsW(L(filename)):
         print(f"{trans("pkgexist")}{filename}")
     else:
         print(f"{trans("collectin")}{filename if info is None else info}...")
 
-        ret = download(url, filename, params, timeout)
+        ret = download(url, filename, timeout)
         
         if isinstance(ret, int):
             if ret == 404:
@@ -280,7 +296,7 @@ def install(
                 print(trans("uninstsuc"))
             else:
                 print(trans("instsuc"))
-            whereisver = localprograms / "Python" / pythonfolder
+            whereisver = rf"{localprograms}\Python\{pythonfolder}"
             writemanage(pyver, whereisver, "x64", adds, True)
             exit(0)
         case 1223 | 1602:
@@ -319,8 +335,8 @@ def build_args(argv: list) -> str:
     return " ".join(parts)
 
 def run_python(exe_template: str, freethread: bool = False, use_pythonw: bool = False) -> None:
-    where = homepath / "versions.json"
-    if not where.exists():
+    where = rf"{homepath}\versions.json"
+    if not PathFileExistsW(L(where)):
         old = getjson()
     else:
         with open(where, "r", encoding = "utf-8") as f:
@@ -347,8 +363,8 @@ def run_python(exe_template: str, freethread: bool = False, use_pythonw: bool = 
             exit(1)
         print(f"\033[0;33m{trans("ifaild")} \"impy inst {args[1].removesuffix("t")}t\" {trans("modit")}\033[0m")
 
-    whereisjson: Path = homepath / "manage.json"
-    if not whereisjson.exists():
+    whereisjson = rf"{homepath}\manage.json"
+    if not PathFileExistsW(L(whereisjson)):
         print(f"\033[0;31m{trans("instst")}\033[0m")
         exit(1)
 
@@ -398,110 +414,157 @@ def run_python(exe_template: str, freethread: bool = False, use_pythonw: bool = 
         CloseHandle(pi.hProcess)
         CloseHandle(pi.hThread)
 
-if __name__ == "__main__":
-    if args == []:
-        print(f"\033[0;31m{trans("cantempty")}\033[0m")
-        exit(1)
+try:
+    if __name__ == "__main__":
+        if args == []:
+            print(f"\033[0;31m{trans("cantempty")}\033[0m")
+            exit(1)
 
-    match args[0]:
-        case "help":
-            print(f"help\t{trans("showcmd")}")
-            print(f"about\t{trans("impt")}")
-            print(f"upd\t{trans("cupd")}")
-            print(f"reld\t{trans("rjson")}")
-            print(f"inst\t{trans("instpy")}")
-            print(f"\thelp\t{trans("allpy")}")
-            print(f"\t\t-s\t{trans("skipeol")}")
-            print(f"\t(V)\t{trans("instpy")}")
-            print(f"\t(V)t\t{trans("insthread")}")
-            print(f"uninst\t{trans("uninstpy")}")
-            print(f"list\t{trans("insted")}")
-            print(f"setdef\t{trans("setdef")}")
-            print(f"add\t{trans("addpy")}")
-            print(f"del\t{trans("rminst")}")
-            print(f"\t(V)\t{trans("rminst")}")
-            print(f"py\t{trans("runpy")} ({trans("like")} \"impy py 3.14 main.py\")")
-            print(f"\t(V)\t{trans("runpy")}")
-            print(f"\t(V)t\t{trans("runpyt")}")
-            print(f"pyw\t{trans("runpyw")} ({trans("like")} \"impy pyw 3.14 main.py\")")
-            print(f"\t(V)\t{trans("runpyw")}")
+        match args[0]:
+            case "help":
+                print(f"help\t{trans("showcmd")}")
+                print(f"about\t{trans("impt")}")
+                print(f"upd\t{trans("cupd")}")
+                print(f"reld\t{trans("rjson")}")
+                print(f"inst\t{trans("instpy")}")
+                print(f"\thelp\t{trans("allpy")}")
+                print(f"\t\t-s\t{trans("skipeol")}")
+                print(f"\t(V)\t{trans("instpy")}")
+                print(f"\t(V)t\t{trans("insthread")}")
+                print(f"uninst\t{trans("uninstpy")}")
+                print(f"list\t{trans("insted")}")
+                print(f"setdef\t{trans("setdef")}")
+                print(f"setintl\t{trans("setintl")}")
+                print(f"add\t{trans("addpy")}")
+                print(f"del\t{trans("rminst")}")
+                print(f"\t(V)\t{trans("rminst")}")
+                print(f"py\t{trans("runpy")} ({trans("like")} \"impy py 3.14 main.py\")")
+                print(f"\t(V)\t{trans("runpy")}")
+                print(f"\t(V)t\t{trans("runpyt")}")
+                print(f"pyw\t{trans("runpyw")} ({trans("like")} \"impy pyw 3.14 main.py\")")
+                print(f"\t(V)\t{trans("runpyw")}")
 
-        case "about":
-            print(f"ImPy {impt}\n[ {", ".join(cincl)} ]\n{trans("copy")}\n{impyascii}")
+            case "about":
+                print(f"ImPy {impt}\n[ {", ".join(cincl)} ]\n{trans("copy")}\n{impyascii}")
 
-        case "upd":
-            old = getjson()
-            match impt:
-                case x if x == old["update"]["dev"]:
-                    print(f"\033[1;36m‼ {trans("future")} ({trans("build")} {x})\033[0m")
-                case x if x == old["update"]["new"]:
-                    print(f"\033[0;32m√ {trans("uptodate")} ({trans("build")}{x})\033[0m")
-                case x if impt in old["update"]["compate"]:
-                    print(f"\033[0;33m! {trans("compate")} {old['update']['new']}{trans("excl")}\033[0m")
-                case x if impt in old["update"]["expires"]:
-                    print(f"\033[0;31m× {trans("iseol")} {old['update']['new']}{trans("excl")}\033[0m")
-                case _:
-                    print(f"\033[0;31m× {trans("oops")}\033[0m")
+            case "upd":
+                old = getjson()
+                match impt:
+                    case x if x == old["update"]["dev"]:
+                        print(f"\033[1;36m‼ {trans("future")} ({trans("build")} {x})\033[0m")
+                    case x if x == old["update"]["new"]:
+                        print(f"\033[0;32m√ {trans("uptodate")} ({trans("build")}{x})\033[0m")
+                    case x if impt in old["update"]["compate"]:
+                        print(f"\033[0;33m! {trans("compate")} {old['update']['new']}{trans("excl")}\033[0m")
+                    case x if impt in old["update"]["expires"]:
+                        print(f"\033[0;31m× {trans("iseol")} {old['update']['new']}{trans("excl")}\033[0m")
+                    case _:
+                        print(f"\033[0;31m× {trans("oops")}\033[0m")
 
-        case "inst":
-            old = getjson()
-            try:
-                a = args[1]
-            except IndexError:
-                print(f"\033[0;31m{trans("invsyn")}\033[0m")
-                exit(1)
-            if a == "help":
+            case "inst":
+                old = getjson()
                 try:
-                    if args[2] in ("--skip-eol", "-s"):
-                        skip_eol = True
-                    else:
-                        skip_eol = False
+                    a = args[1]
                 except IndexError:
-                    skip_eol = False
-                a: list = old["eol"] + old["security"] + old["active"]
-                print(trans("insthelpbar"))
-                for k, v in old["alias"].items():
-                    if v in old["eol"] and skip_eol:
-                        continue
-                    if len(k) > 7:
-                        print(f"{k[:6]}-\t{v}")
-                        print(k[6:])
-                    else:
-                        print(f"{k}\t{v}")
-                print(trans("ngap"))
-                print(trans("instverbar"))
+                    print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                    exit(1)
+                if a == "help":
+                    try:
+                        if args[2] in ("--skip-eol", "-s"):
+                            skip_eol = True
+                        else:
+                            skip_eol = False
+                    except IndexError:
+                        skip_eol = False
+                    a: list = old["eol"] + old["security"] + old["active"]
+                    print(trans("insthelpbar"))
+                    for k, v in old["alias"].items():
+                        if v in old["eol"] and skip_eol:
+                            continue
+                        if len(k) > 7:
+                            print(f"{k[:6]}-\t{v}")
+                            print(k[6:])
+                        else:
+                            print(f"{k}\t{v}")
+                    print(trans("ngap"))
+                    print(trans("instverbar"))
 
-                s: int = 0
-                for i in a:
-                    match i:
-                        case x if x in old["eol"]:
-                            if skip_eol:
-                                continue
-                            cat = f"\033[0;31m× {trans("eolw")}\033[0m"
-                            s += 1
-                        case x if x in old["active"]:
-                            if x in old["latest"]:
-                                cat = f"\033[1;36m‼ {trans("latestw")}\033[0m"
-                            else:
-                                cat = f"\033[0;32m√ {trans("activew")}\033[0m"
-                            s += 1
-                        case x if x in old["security"]:
-                            cat = f"\033[0;33m! {trans("securityw")}\033[0m"
-                            s += 1
-                        case _:
-                            print(f"\033[0;31m{trans("ferr")}\033[0m")
-                            exit(1)
-                    print(f"{cat}\t{i}")
-                print(trans("total").format(s))
-                for c in old["credits"][loc]:
-                    match loc:
-                        case "zh_CN":
-                            print(f"\n鸣谢 {c['name']} {c['info']}！")
-                        case "zh_TW":
-                            print(f"\n鳴謝 {c['name']} {c['info']}！")
-                        case _:
-                            print(f"\nThanks {c['name']} for {c['info']}!")
-            else:
+                    s: int = 0
+                    for i in a:
+                        match i:
+                            case x if x in old["eol"]:
+                                if skip_eol:
+                                    continue
+                                cat = f"\033[0;31m× {trans("eolw")}\033[0m"
+                                s += 1
+                            case x if x in old["active"]:
+                                if x in old["latest"]:
+                                    cat = f"\033[1;36m‼ {trans("latestw")}\033[0m"
+                                else:
+                                    cat = f"\033[0;32m√ {trans("activew")}\033[0m"
+                                s += 1
+                            case x if x in old["security"]:
+                                cat = f"\033[0;33m! {trans("securityw")}\033[0m"
+                                s += 1
+                            case _:
+                                print(f"\033[0;31m{trans("ferr")}\033[0m")
+                                exit(1)
+                        print(f"{cat}\t{i}")
+                    print(trans("total").format(s))
+                    for c in old["credits"][loc]:
+                        match loc:
+                            case "zh_CN":
+                                print(f"\n鸣谢 {c['name']} {c['info']}！")
+                            case "zh_TW":
+                                print(f"\n鳴謝 {c['name']} {c['info']}！")
+                            case _:
+                                print(f"\nThanks {c['name']} for {c['info']}!")
+                else:
+                    try:
+                        v = args[1]
+                    except IndexError:
+                        print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                        exit(1)
+                    tswit = v.endswith("t")
+                    v = v.removesuffix("t") if v.endswith("t") else v
+                    syn = old["eol"] + old["security"] + old["active"]
+
+                    v = old["alias"][v] if v in old["alias"] else v
+                    if v not in syn:
+                        print(f"\033[0;31m{trans("unkver")}\033[0m")
+                        exit(1)
+                    shouldfn = rf"{setups}\python-{v}-amd64.exe"
+                    try:
+                        match args[2:]:
+                            case x if tswit:
+                                switch = " /passive Include_pip=1 Include_freethreaded=1"
+                            case _:
+                                switch = " /passive Include_pip=1"
+                    except IndexError:
+                        switch = " /passive Include_pip=1"
+                    
+                    if v in old["eol"]:
+                        spec = v + trans("brkeol")
+                    elif v in old["security"]:
+                        spec = v + trans("brksec")
+                    else:
+                        spec = v
+
+                    insturl = getjson("route.json")["python"][v]
+                    install(
+                        insturl,
+                        shouldfn,
+                        switch,
+                        v,
+                        f"Python{v.split(".")[0]}{v.split(".")[1]}",
+                        None,
+                        f"Python {spec}",
+                        True,
+                        False
+                    )
+
+            case "uninst":
+                old = getjson()
                 try:
                     v = args[1]
                 except IndexError:
@@ -515,16 +578,8 @@ if __name__ == "__main__":
                 if v not in syn:
                     print(f"\033[0;31m{trans("unkver")}\033[0m")
                     exit(1)
-                shouldfn = setups / f"python-{v}-amd64.exe"
-                try:
-                    match args[2:]:
-                        case x if tswit:
-                            switch = " /passive Include_pip=1 Include_freethreaded=1"
-                        case _:
-                            switch = " /passive Include_pip=1"
-                except IndexError:
-                    switch = " /passive Include_pip=1"
-                
+                shouldfn = rf"{setups}\python-{v}-amd64.exe"
+
                 if v in old["eol"]:
                     spec = v + trans("brkeol")
                 elif v in old["security"]:
@@ -536,233 +591,226 @@ if __name__ == "__main__":
                 install(
                     insturl,
                     shouldfn,
-                    switch,
+                    " /uninstall",
                     v,
                     f"Python{v.split(".")[0]}{v.split(".")[1]}",
                     {},
                     None,
                     f"Python {spec}",
-                    True,
-                    False
+                    False,
+                    True
                 )
 
-        case "uninst":
-            old = getjson()
-            try:
-                v = args[1]
-            except IndexError:
-                print(f"\033[0;31m{trans("invsyn")}\033[0m")
-                exit(1)
-            tswit = v.endswith("t")
-            v = v.removesuffix("t") if v.endswith("t") else v
-            syn = old["eol"] + old["security"] + old["active"]
+            case "list":
+                whereisjson = rf"{homepath}\manage.json"
+                if not PathFileExistsW(L(whereisjson)):
+                    print(f"\033[0;31m{trans("instst")}\033[0m")
+                    exit(1)
 
-            v = old["alias"][v] if v in old["alias"] else v
-            if v not in syn:
-                print(f"\033[0;31m{trans("unkver")}\033[0m")
-                exit(1)
-            shouldfn = setups / f"python-{v}-amd64.exe"
+                with open(whereisjson, "r", encoding = "utf-8") as f:
+                    c: dict = load(f)
+                if c == {}:
+                    print(f"\033[0;31m{trans("ferr")}\033[0m")
+                    exit(1)
+                print(trans("lsvap"))
+                s = list(c.keys())
+                s.sort()
 
-            if v in old["eol"]:
-                spec = v + trans("brkeol")
-            elif v in old["security"]:
-                spec = v + trans("brksec")
-            else:
-                spec = v
+                n = 0
+                    
+                for i in s:
+                    try:
+                        a = c[i]["arch"]
+                    except KeyError:
+                        a = "?"
 
-            insturl = getjson("route.json")["python"][v]
-            install(
-                insturl,
-                shouldfn,
-                " /uninstall",
-                v,
-                f"Python{v.split(".")[0]}{v.split(".")[1]}",
-                {},
-                None,
-                f"Python {spec}",
-                False,
-                True
-            )
+                    try:
+                        p = c[i]["path"]
+                    except KeyError:
+                        p = "?"
 
-        case "list":
-            whereisjson: Path = homepath / "manage.json"
-            if not whereisjson.exists():
-                print(f"\033[0;31m{trans("instst")}\033[0m")
-                exit(1)
+                    try:
+                        d = f"\033[0;32m{trans("brkdef")}\033[0m" if c[i]["default"] else f"\033[0;31m{trans("brkndef")}\033[0m"
+                    except KeyError:
+                        d = "?"
 
-            with open(whereisjson, "r", encoding = "utf-8") as f:
-                c: dict = load(f)
-            if c == {}:
-                print(f"\033[0;31m{trans("ferr")}\033[0m")
-                exit(1)
-            print(trans("lsvap"))
-            s = list(c.keys())
-            s.sort()
-
-            n = 0
-                
-            for i in s:
-                try:
-                    a = c[i]["arch"]
-                except KeyError:
-                    a = "?"
-
-                try:
-                    p = c[i]["path"]
-                except KeyError:
-                    p = "?"
-
-                try:
-                    d = f"\033[0;32m{trans("brkdef")}\033[0m" if c[i]["default"] else f"\033[0;31m{trans("brkndef")}\033[0m"
-                except KeyError:
-                    d = "?"
-
-                isdef = c[i]["default"]
-                
-                if len(i) > 7:
-                    print(f"{i[:6]}-\t{a}\t{d}\t{p}")
-                    print(i[6:])
-                else:
-                    print(f"{i}\t{a}\t{d}\t{p}")
-
-                n += 1
-
-            print(trans("total").format(n))
-            print(trans("ngap"))
-
-        case "reld":
-            try:
-                getjson()
-                print(trans("relsuc"))
-
-            except Exception as e:
-                print(f"\033[0;31m{trans("unkerr")} ({e})\033[0m")
-
-        case "py":
-            run_python("python.exe")
-
-        case "pyw":
-            run_python("pythonw.exe", use_pythonw = True)
-
-        case "del":
-            where = homepath / "versions.json"
-            if not where.exists():
-                old = getjson()
-            else:
-                with open(where, "r", encoding = "utf-8") as f:
-                    old = load(f)
-            try:
-                v = args[1]
-            except IndexError:
-                print(f"\033[0;31m{trans("invsyn")}\033[0m")
-                exit(1)
-
-            v = old["alias"][v] if v in old["alias"] else v
-            instr = setups / f"python-{v}-amd64.exe"
-            if not instr.exists():
-                print(trans("nothingrm"))
-            else:
-                if v in old["eol"]:
-                    spec = v + trans("brkeol")
-                elif v in old["security"]:
-                    spec = v + trans("brksec")
-                else:
-                    spec = v
-                remove(str(instr), trans("instofpy").format(spec))
-
-        case "setdef":
-            old = getjson()
-            whereisjson: Path = homepath / "manage.json"
-            if not whereisjson.exists():
-                print(f"\033[0;31m{trans("instst")}\033[0m")
-                exit(1)
-
-            try:
-                v = args[1]
-            except IndexError:
-                print(f"\033[0;31m{trans("invsyn")}\033[0m")
-                exit(1)
-
-            v = old["alias"][v] if v in old["alias"] else v
-
-            with open(whereisjson, "r", encoding = "utf-8") as f:
-                c: dict = load(f)
-            if c == {} or v not in c.keys():
-                print(f"\033[0;31m{trans("ferr")}\033[0m")
-                exit(1)
-
-            regk = OpenKey(
-                HKEY_CURRENT_USER,
-                r"Environment",
-                0,
-                KEY_READ | KEY_WRITE
-            )
-
-            try:
-                cpath, dtype = QueryValueEx(regk, "Path")
-
-            except FileNotFoundError:
-                cpath = ""
-                dtype = REG_EXPAND_SZ
-
-            cpathls = cpath.split(";")
-            if "" in cpathls:
-                while cpathls.count("") != 0:
-                    cpathls.remove("")
-            ks = list(c.keys())
-            ks.remove(v)
-            for k in ks:
-                pstr = c[k]["path"]
-                pscripts = rf"{pstr}\Scripts"
-                while pstr in cpathls or pscripts in cpathls:
-                    if pstr in cpathls and pscripts in cpathls:
-                        cpathls.remove(pstr)
-                        cpathls.remove(pscripts)
-                    elif pstr in cpathls:
-                        cpathls.remove(pstr)
-                    elif pscripts in cpathls:
-                        cpathls.remove(pscripts)
+                    isdef = c[i]["default"]
+                    
+                    if len(i) > 7:
+                        print(f"{i[:6]}-\t{a}\t{d}\t{p}")
+                        print(i[6:])
                     else:
-                        break
-                writemanage(k, pstr, "x64")
+                        print(f"{i}\t{a}\t{d}\t{p}")
 
-            if c[v]["path"] in cpathls:
-                if rf"{c[v]["path"]}\Scripts" in cpathls:
+                    n += 1
+
+                print(trans("total").format(n))
+                print(trans("ngap"))
+
+            case "reld":
+                try:
+                    getjson()
+                    print(trans("relsuc"))
+
+                except Exception as e:
+                    print(f"\033[0;31m{trans("unkerr")} ({e})\033[0m")
+
+            case "py":
+                run_python("python.exe")
+
+            case "pyw":
+                run_python("pythonw.exe", use_pythonw = True)
+
+            case "del":
+                where = rf"{homepath}\versions.json"
+                if not PathFileExistsW(L(where)):
+                    old = getjson()
+                else:
+                    with open(where, "r", encoding = "utf-8") as f:
+                        old = load(f)
+                try:
+                    v = args[1]
+                except IndexError:
+                    print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                    exit(1)
+
+                v = old["alias"][v] if v in old["alias"] else v
+                instr = rf"{setups}\python-{v}-amd64.exe"
+                if not PathFileExistsW(L(instr)):
+                    print(trans("nothingrm"))
+                else:
+                    if v in old["eol"]:
+                        spec = v + trans("brkeol")
+                    elif v in old["security"]:
+                        spec = v + trans("brksec")
+                    else:
+                        spec = v
+                    remove(str(instr), trans("instofpy").format(spec))
+
+            case "setdef":
+                old = getjson()
+                whereisjson = rf"{homepath}\manage.json"
+                if not PathFileExistsW(L(whereisjson)):
+                    print(f"\033[0;31m{trans("instst")}\033[0m")
+                    exit(1)
+
+                try:
+                    v = args[1]
+                except IndexError:
+                    print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                    exit(1)
+
+                v = old["alias"][v] if v in old["alias"] else v
+
+                with open(whereisjson, "r", encoding = "utf-8") as f:
+                    c: dict = load(f)
+                if c == {} or v not in c.keys():
+                    print(f"\033[0;31m{trans("ferr")}\033[0m")
+                    exit(1)
+
+                regk = OpenKey(
+                    HKEY_CURRENT_USER,
+                    r"Environment",
+                    0,
+                    KEY_READ | KEY_WRITE
+                )
+
+                try:
+                    cpath, dtype = QueryValueEx(regk, "Path")
+
+                except FileNotFoundError:
+                    cpath = ""
+                    dtype = REG_EXPAND_SZ
+
+                cpathls = cpath.split(";")
+                if "" in cpathls:
+                    while cpathls.count("") != 0:
+                        cpathls.remove("")
+                ks = list(c.keys())
+                ks.remove(v)
+                for k in ks:
+                    pstr = c[k]["path"]
+                    pscripts = rf"{pstr}\Scripts"
+                    while pstr in cpathls or pscripts in cpathls:
+                        if pstr in cpathls and pscripts in cpathls:
+                            cpathls.remove(pstr)
+                            cpathls.remove(pscripts)
+                        elif pstr in cpathls:
+                            cpathls.remove(pstr)
+                        elif pscripts in cpathls:
+                            cpathls.remove(pscripts)
+                        else:
+                            break
+                    writemanage(k, pstr, "x64")
+
+                if c[v]["path"] in cpathls:
+                    if rf"{c[v]["path"]}\Scripts" in cpathls:
+                        ...
+                    else:
+                        cpathls = [rf"{c[v]["path"]}\Scripts"] + cpathls
+                elif rf"{c[v]["path"]}\Scripts" in cpathls:
                     ...
                 else:
-                    cpathls = [rf"{c[v]["path"]}\Scripts"] + cpathls
-            elif rf"{c[v]["path"]}\Scripts" in cpathls:
-                ...
-            else:
-                cpathls = [c[v]["path"], rf"{c[v]["path"]}\Scripts"] + cpathls
+                    cpathls = [c[v]["path"], rf"{c[v]["path"]}\Scripts"] + cpathls
+                
+                cpath = ";".join(i for i in cpathls)
+                SetValueEx(regk, "Path", 0, REG_EXPAND_SZ, cpath)
+                CloseKey(regk)
+
+                writemanage(v, c[v]["path"], "x64", True, True)
+
+                print(trans("setdefsuc").format(v))
+
+            case "add":
+                old = getjson()
+                try:
+                    v = args[1]
+                    p = args[2]
+                except IndexError:
+                    print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                    exit(1)
+
+                v = old["alias"][v] if v in old["alias"] else v
+                python = rf"{p}\python.exe"
+                pythonw = rf"{p}\pythonw.exe"
+
+                if PathFileExistsW(L(python)) and PathFileExistsW(L(pythonw)):
+                    writemanage(v, p)
+                    print(trans("addpysuc"))
+                else:
+                    print(f"\033[0;31m{trans("invpath")}\033[0m")
+
+            case "setintl":
+                try:
+                    l = args[1]
+                except IndexError:
+                    print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                    exit(1)
+
+                ol = configcontent["lang"]
+                Ol = l
+
+                if l == "default":
+                    l = None
+
+                elif l not in ["en_US", "zh_CN", "zh_TW"]:
+                    print(f"\033[0;31m{trans("ferr")}\033[0m")
+                    exit(1)
+                
+                with open(config, "w") as f:
+                    dump(configcontent | {"lang": l}, f)
+
+                if ol is None:
+                    ol = "default"
+
+                actual = l if l is not None else "en_US"
+
+                print(f"{trans("setintlsuc", actual).format(Ol)} {ol})")
             
-            cpath = ";".join(i for i in cpathls)
-            SetValueEx(regk, "Path", 0, REG_EXPAND_SZ, cpath)
-            CloseKey(regk)
-
-            writemanage(v, c[v]["path"], "x64", True, True)
-
-            print(trans("setdefsuc").format(v))
-
-        case "add":
-            old = getjson()
-            try:
-                v = args[1]
-                p = args[2]
-            except IndexError:
+            case _:
                 print(f"\033[0;31m{trans("invsyn")}\033[0m")
                 exit(1)
 
-            v = old["alias"][v] if v in old["alias"] else v
-            python = Path(p) / "python.exe"
-            pythonw = Path(p) / "pythonw.exe"
-
-            if python.exists() and pythonw.exists():
-                writemanage(v, p)
-                print(trans("addpysuc"))
-            else:
-                print(f"\033[0;31m{trans("invpath")}\033[0m")
-        
-        case _:
-            print(f"\033[0;31m{trans("invsyn")}\033[0m")
-            exit(1)
+except KeyboardInterrupt:
+    print(trans("kbintr"))
+    exit(0xC000013A)

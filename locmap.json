@@ -471,5 +471,23 @@
         "zh_CN": "无效路径！",
         "zh_TW": "無效路徑！",
         "en_US": "Invalid path!"
+    },
+
+    "kbintr": {
+        "zh_CN": "暂停！",
+        "zh_TW": "暫停！",
+        "en_US": "Pause!"
+    },
+
+    "setintlsuc": {
+        "zh_CN": "成功将 {} 设置为默认的语言！ (原先为",
+        "zh_TW": "成功將 {} 設定為默認的語言！ (原先為",
+        "en_US": "Successfully set {} as the default language! (former"
+    },
+
+    "setintl": {
+        "zh_CN": "设置默认的语言",
+        "zh_TW": "設定默認的語言",
+        "en_US": "Set default language"
     }
 }

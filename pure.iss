@@ -1,10 +1,10 @@
 [Setup]
 AppName=ImPy
-AppVersion=26.1.4
-VersionInfoVersion=26.1.4.0
+AppVersion=26.1.6
+VersionInfoVersion=26.1.6.0
 AppPublisher=MBLC7
 AppCopyright=Copyright (C) 2026 MBLC7
-DefaultDirName={localappdata}\Programs\ImPy\Client
+DefaultDirName={localappdata}\Programs\ImPy\client
 DefaultGroupName=ImPy
 OutputDir=Output
 OutputBaseFilename=ImPy-{#SetupSetting("AppVersion")}-pure-x64
@@ -40,35 +40,6 @@ Name: "{group}\ImPy CPT"; \
     Parameters: "/k ""{app}\cpt.bat"""; \
     WorkingDir: "{app}"; \
     IconFilename: "{app}\impy.exe"
-
-[Registry]
-Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "Path"; \
-    Check: NeedsAddPath('{app}')
-
-[Code]
-function NeedsAddPath(Param: string): boolean;
-var
-  OrigPath: string;
-begin
-  if not RegQueryStringValue(HKCU, 'Environment', 'Path', OrigPath) then
-    Result := True
-  else
-    Result := Pos(Param, OrigPath) = 0;
-end;
-
-procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
-var
-  OrigPath: string;
-  NewPath: string;
-begin
-  if CurUninstallStep = usPostUninstall then
-    if RegQueryStringValue(HKCU, 'Environment', 'Path', OrigPath) then
-    begin
-      StringChangeEx(OrigPath, '{app};', '', True);
-      StringChangeEx(OrigPath, '{app}', '', True);
-      RegWriteStringValue(HKCU, 'Environment', 'Path', OrigPath);
-    end;
-end;
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"

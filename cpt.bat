@@ -1,8 +1,11 @@
 @echo off
-echo ===================================
-echo *                                 *
-echo * ImPy Command Prompt Tool 26.1.4 *
-echo *                                 *
-echo ===================================
+title ImPy CPT
+echo ===================
+echo * ImPy CPT 26.1.6 *
+echo ===================
+echo.
+echo TIP: Everytime before enter commands, add "impy " at the front!
+echo.
+impy help
 cd /d "%~dp0"
 echo.

@@ -12,22 +12,11 @@ def L(value: str, size: int | None = None) -> __CTYPES.c_wchar_p:
     )
 
 __KERNEL32 = __CTYPES.windll.kernel32
-__DWMAPI = __CTYPES.windll.dwmapi
-__USER32 = __CTYPES.windll.user32
-__SHELL32 = __CTYPES.windll.shell32
+__SHLWAPI = __CTYPES.windll.shlwapi
 
-CREATE_NO_WINDOW = 0x08000000
-CREATE_NEW_CONSOLE = 0x00000010
-DETACHED_PROCESS = 0x00000008
-CREATE_UNICODE_ENVIRONMENT = 0x00000400
-DEBUG_ONLY_THIS_PROCESS = 0x00000002
-CREATE_SUSPENDED = 0x00000004
-DEBUG_PROCESS = 0x00000001
-MAX_PATH = 0x00000104
 INFINITY = 0xFFFFFFFF
 
 INT = __CTYPES.c_int
-UINT = __CTYPES.c_uint
 WORD = __CTYPES.c_ushort
 DWORD = __CTYPES.c_ulong
 LPDWORD = ptr(DWORD)
@@ -35,43 +24,12 @@ LPWSTR = __CTYPES.c_wchar_p
 LPCWSTR = __CTYPES.c_wchar_p
 BOOL = __CTYPES.c_int
 LPVOID = __CTYPES.c_void_p
-LPCVOID = __CTYPES.c_void_p
 BYTE = __CTYPES.c_byte
 LPBYTE = ptr(BYTE)
-WCHAR = __CTYPES.c_wchar
 HANDLE = __CTYPES.c_void_p
-HWND = HANDLE
 LONG = __CTYPES.c_long
-HRESULT = LONG
 LONG_PTR = __CTYPES.c_longlong
-LRESULT = LONG
 ULONG_PTR = __CTYPES.c_ulonglong
-WPARAM = ULONG_PTR
-LPARAM = LONG_PTR
-PCWSTR = __CTYPES.c_wchar_p
-COLORREF = DWORD
-LONGLONG = __CTYPES.c_longlong
-ULONGLONG = __CTYPES.c_ulonglong
-
-class tagRECT(struct):
-    _fields_ = [
-        ("left", LONG),
-        ("top", LONG),
-        ("right", LONG),
-        ("bottom", LONG)
-    ]
-RECT = tagRECT
-LPRECT = ptr(RECT)
-
-class _MARGINS(struct):
-    _fields_ = [
-        ("cxLeftWidth", INT),
-        ("cxRightWidth", INT),
-        ("cyTopHeight", INT),
-        ("cyBottomHeight", INT)
-    ]
-MARGINS = _MARGINS
-PMARGINS = ptr(MARGINS)
 
 class _SECURITY_ATTRIBUTES(struct):
     _fields_ = [
@@ -115,32 +73,6 @@ class _PROCESS_INFORMATION(struct):
     ]
 PROCESS_INFORMATION = _PROCESS_INFORMATION
 LPPROCESS_INFORMATION = ptr(PROCESS_INFORMATION)
-
-class _FILETIME(struct):
-    _fields_ = [
-        ("dwLowDateTime", DWORD),
-        ("dwHighDateTime", DWORD)
-    ]
-FILETIME = _FILETIME
-
-class _WIN32_FIND_DATAW(struct):
-    _fields_ = [
-        ("dwFileAttributes", DWORD),
-        ("ftCreationTime", FILETIME),
-        ("ftLastAccessTime", FILETIME),
-        ("ftLastWriteTime", FILETIME),
-        ("nFileSizeHigh", DWORD),
-        ("nFileSizeLow", DWORD),
-        ("dwReserved0", DWORD),
-        ("dwReserved1", DWORD),
-        ("cFileName", WCHAR * MAX_PATH),
-        ("cAlternateFileName", WCHAR * 14),
-        # ("dwFileType", DWORD),
-        # ("dwCreatorType", DWORD),
-        # ("wFinderFlags", WORD)
-    ]
-WIN32_FIND_DATAW = _WIN32_FIND_DATAW
-LPWIN32_FIND_DATAW = ptr(WIN32_FIND_DATAW)
 
 __KERNEL32.CreateProcessW.argtypes = [
     LPCWSTR,
@@ -194,45 +126,6 @@ def WaitForSingleObject(
         dwMilliseconds
     )
 
-__KERNEL32.TerminateProcess.argtypes = [
-    HANDLE,
-    UINT
-]
-__KERNEL32.TerminateProcess.restype = BOOL
-def TerminateProcess(
-        hProcess: HANDLE,
-        uExitCode: UINT
-) -> BOOL:
-    return __KERNEL32.TerminateProcess(
-        hProcess,
-        uExitCode
-    )
-
-__KERNEL32.FindFirstFileW.argtypes = [
-    LPCWSTR,
-    LPWIN32_FIND_DATAW
-]
-__KERNEL32.FindFirstFileW.restype = HANDLE
-def FindFirstFileW(
-        lpFileName: LPCWSTR,
-        lpFindFileData: LPWIN32_FIND_DATAW # type: ignore
-) -> HANDLE:
-    return __KERNEL32.FindFirstFileW(
-        lpFileName,
-        lpFindFileData
-    )
-
-__KERNEL32.RemoveDirectoryW.argtypes = [
-    LPCWSTR
-]
-__KERNEL32.RemoveDirectoryW.restype = BOOL
-def RemoveDirectoryW(
-        lpPathName: LPCWSTR
-) -> BOOL:
-    return __KERNEL32.RemoveDirectoryW(
-        lpPathName
-    )
-
 __KERNEL32.CreateDirectoryW.argtypes = [
     LPCWSTR,
     LPSECURITY_ATTRIBUTES
@@ -258,60 +151,6 @@ def DeleteFileW(
         lpFileName
     )
 
-__KERNEL32.CreateFileW.argtypes = [
-    LPCWSTR,
-    DWORD,
-    DWORD,
-    LPSECURITY_ATTRIBUTES,
-    DWORD,
-    DWORD,
-    HANDLE
-]
-__KERNEL32.CreateFileW.restype = HANDLE
-def CreateFileW(
-        lpFileName: LPCWSTR,
-        dwDesiredAccess: DWORD,
-        dwShareMode: DWORD,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES, # type: ignore
-        dwCreationDisposition: DWORD,
-        dwFlagsAndAttributes: DWORD,
-        hTemplateFile: HANDLE
-) -> HANDLE:
-    return __KERNEL32.CreateFileW(
-        lpFileName,
-        dwDesiredAccess,
-        dwShareMode,
-        lpSecurityAttributes,
-        dwCreationDisposition,
-        dwFlagsAndAttributes,
-        hTemplateFile
-    )
-
-__KERNEL32.FindClose.argtypes = [
-    HANDLE
-]
-__KERNEL32.FindClose.restype = BOOL
-def FindClose(
-        hFindFile: HANDLE
-) -> BOOL:
-    return __KERNEL32.FindClose(
-        hFindFile
-    )
-
-__KERNEL32.FindNextFileW.argtypes = [
-    HANDLE,
-    LPWIN32_FIND_DATAW
-]
-__KERNEL32.FindNextFileW.restype = BOOL
-def FindNextFileW(
-        hFindFile: HANDLE,
-        lpFindFileData: LPWIN32_FIND_DATAW # type: ignore
-) -> BOOL:
-    return __KERNEL32.FindNextFileW(
-        hFindFile,
-        lpFindFileData
-    )
-
 __KERNEL32.CloseHandle.argtypes = [
     HANDLE
 ]
@@ -321,178 +160,6 @@ def CloseHandle(
 ) -> BOOL:
     return __KERNEL32.CloseHandle(
         hObject
-    )
-
-__DWMAPI.DwmSetWindowAttribute.argtypes = [
-    HWND,
-    DWORD,
-    LPCVOID,
-    DWORD
-]
-__DWMAPI.DwmSetWindowAttribute.restype = HRESULT
-def DwmSetWindowAttribute(
-        hwnd: HWND,
-        dwAttribute: DWORD,
-        pvAttribute: LPCVOID,
-        cbAttribute: DWORD
-) -> HRESULT:
-    return __DWMAPI.DwmSetWindowAttribute(
-        hwnd,
-        dwAttribute,
-        pvAttribute,
-        cbAttribute
-    )
-
-__USER32.ReleaseCapture.argtypes = []
-__USER32.ReleaseCapture.restype = BOOL
-def ReleaseCapture() -> BOOL:
-    return __USER32.ReleaseCapture()
-
-__USER32.SendMessageW.argtypes = [
-    HWND,
-    UINT,
-    WPARAM,
-    LPARAM
-]
-__USER32.SendMessageW.restype = LRESULT
-def SendMessageW(
-        hWnd: HWND,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM
-) -> LRESULT:
-    return __USER32.SendMessageW(
-        hWnd,
-        Msg,
-        wParam,
-        lParam
-    )
-
-__USER32.GetWindowRect.argtypes = [
-    HWND,
-    LPRECT
-]
-__USER32.GetWindowRect.restype = BOOL
-def GetWindowRect(
-        hWnd: HWND,
-        lpRect: LPRECT, # type: ignore
-) -> BOOL:
-    return __USER32.GetWindowRect(
-        hWnd,
-        lpRect
-    )
-
-__USER32.DefWindowProcW.argtypes = [
-    HWND,
-    UINT,
-    WPARAM,
-    LPARAM
-]
-__USER32.DefWindowProcW.restype = LRESULT
-def DefWindowProcW(
-        hWnd: HWND,
-        Msg: UINT,
-        wParam: WPARAM,
-        lParam: LPARAM
-) -> LRESULT:
-    return __USER32.DefWindowProcW(
-        hWnd,
-        Msg,
-        wParam,
-        lParam
-    )
-
-__USER32.SetWindowLongPtrW.argtypes = [
-    HWND,
-    INT,
-    LONG_PTR
-]
-__USER32.SetWindowLongPtrW.restype = LONG_PTR
-def SetWindowLongPtrW(
-        hWnd: HWND,
-        nIndex: INT,
-        dwNewLong: LONG_PTR
-) -> LONG_PTR:
-    return __USER32.SetWindowLongPtrW(
-        hWnd,
-        nIndex,
-        dwNewLong
-    )
-
-__SHELL32.SetCurrentProcessExplicitAppUserModelID.argtypes = [
-    PCWSTR
-]
-__SHELL32.SetCurrentProcessExplicitAppUserModelID.restype = HRESULT
-def SetCurrentProcessExplicitAppUserModelID(
-        AppID: PCWSTR
-) -> HRESULT:
-    return __SHELL32.SetCurrentProcessExplicitAppUserModelID(
-        AppID
-    )
-
-__DWMAPI.DwmExtendFrameIntoClientArea.argtypes = [
-    HWND,
-    PMARGINS
-]
-__DWMAPI.DwmExtendFrameIntoClientArea.restype = HRESULT
-def DwmExtendFrameIntoClientArea(
-        hWnd: HWND,
-        pMarInset: PMARGINS # type: ignore
-) -> HRESULT:
-    return __DWMAPI.DwmExtendFrameIntoClientArea(
-        hWnd,
-        pMarInset
-    )
-
-__USER32.SetLayeredWindowAttributes.argtypes = [
-    HWND,
-    COLORREF,
-    BYTE,
-    DWORD
-]
-__USER32.SetLayeredWindowAttributes.restype = BOOL
-def SetLayeredWindowAttributes(
-        hwnd: HWND,
-        crKey: COLORREF,
-        bAlpha: BYTE,
-        dwFlags: DWORD
-) -> BOOL:
-    return __USER32.SetLayeredWindowAttributes(
-        hwnd,
-        crKey,
-        bAlpha,
-        dwFlags
-    )
-
-__USER32.GetWindowLongW.argtypes = [
-    HWND,
-    INT
-]
-__USER32.GetWindowLongW.restype = LONG
-def GetWindowLongW(
-        hWnd: HWND,
-        nIndex: INT
-) -> LONG:
-    return __USER32.GetWindowLongW(
-        hWnd,
-        nIndex
-    )
-
-__USER32.SetWindowLongW.argtypes = [
-    HWND,
-    INT,
-    LONG
-]
-__USER32.SetWindowLongW.restype = LONG
-def SetWindowLongW(
-        hWnd: HWND,
-        nIndex: INT,
-        dwNewLong: LONG
-) -> LONG:
-    return __USER32.SetWindowLongW(
-        hWnd,
-        nIndex,
-        dwNewLong
     )
 
 __KERNEL32.GetExitCodeProcess.argtypes = [
@@ -507,4 +174,15 @@ def GetExitCodeProcess(
     return __KERNEL32.GetExitCodeProcess(
         hProcess,
         lpExitCode
+    )
+
+__SHLWAPI.PathFileExistsW.argtypes = [
+    LPCWSTR
+]
+__SHLWAPI.PathFileExistsW.restype = BOOL
+def PathFileExistsW(
+        pszPath: LPCWSTR
+) -> BOOL:
+    return __SHLWAPI.PathFileExistsW(
+        pszPath
     )
