@@ -1,8 +1,8 @@
 @echo off
 title ImPy CPT
-echo ===================
-echo * ImPy CPT 26.1.6 *
-echo ===================
+echo =====================
+echo * ImPy CPT 26.1.7d1 *
+echo =====================
 echo.
 echo TIP: Everytime before enter commands, add "impy " at the front!
 echo.
