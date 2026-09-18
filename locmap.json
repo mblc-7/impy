@@ -308,7 +308,7 @@
     "compate": {
         "zh_CN": "您的 ImPy 虽然还兼容，但是还是推荐下载最新",
         "zh_TW": "您的 ImPy 雖然還兼容，但是還是推薦下載最新",
-        "en_US": "Your ImPy is still compatible, but we recommend to update it to latest"
+        "en_US": "Your ImPy is still compatible, but we recommend to update it to the latest version"
     },
 
     "excl": {
@@ -336,9 +336,9 @@
     },
 
     "ngap": {
-        "zh_CN": "\n\"-\" 只是间隔，不是版本号的一部分！\n例子：3.15.0-↵rc1 -> 3.15.0rc1",
-        "zh_TW": "\n\"-\" 只是間隔，不是版本號的一部分！\n例子：3.15.0-↵rc1 -> 3.15.0rc1",
-        "en_US": "\n\"-\" is gap, not part of version!\ne.g. 3.15.0-↵rc1 -> 3.15.0rc1"
+        "zh_CN": "\n\"-\" 只是间隔，不是版本号的一部分！\n例子：3.15.0-↵rc2 -> 3.15.0rc2",
+        "zh_TW": "\n\"-\" 只是間隔，不是版本號的一部分！\n例子：3.15.0-↵rc2 -> 3.15.0rc2",
+        "en_US": "\n\"-\" is gap, not part of version!\ne.g. 3.15.0-↵rc2 -> 3.15.0rc2"
     },
 
     "instverbar": {
@@ -489,5 +489,11 @@
         "zh_CN": "设置默认的语言",
         "zh_TW": "設定默認的語言",
         "en_US": "Set default language"
+    },
+
+    "listspec": {
+        "zh_CN": "特定一个已安装的 Python 的信息",
+        "zh_TW": "特定一個已安裝的 Python 的訊息",
+        "en_US": "Specific one installed Python's informations"
     }
 }

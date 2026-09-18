@@ -21,7 +21,7 @@ homepath = rf"{localprograms}\ImPy"
 mkdir(homepath)
 setups = rf"{homepath}\python"
 mkdir(setups)
-impt = "26.1.6"
+impt = "26.1.7d1"
 cincl = ["Python 3.14.7", "Inno Setup 7.1.0", "CL 19.51.36257"]
 config = rf"{homepath}\config.json"
 
@@ -70,9 +70,7 @@ if machine().lower() not in ["amd64", "arm64"]:
 
 v = getwindowsversion()
 match (v.major, v.minor, v.build):
-    case (5, 1, _):
-        print(f"\033[0;33m{trans("unsupport")} Windows XP\033[0m")
-    case (5, 2, _):
+    case (5, 1, _) | (5, 2, _):
         print(f"\033[0;33m{trans("unsupport")} Windows XP\033[0m")
     case (6, 0, _):
         print(f"\033[0;33m{trans("unsupport")} Windows Vista\033[0m")
@@ -112,7 +110,7 @@ impyascii = f"""         {trgb("----:----==+", 0, 128, 128)}
 """
 
 header = {
-    "User-Agent": f"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0 ImPy/{impt}",
+    "User-Agent": f"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/156.0 ImPy/{impt}",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.5",
     "Accept-Encoding": "gzip, deflate, br",
@@ -131,7 +129,6 @@ def writemanage(
         adds: bool = True,
         isdef: bool = False
     ):
-    pypath = str(pypath)
     creator = {
         version: {
             "arch": arch,
@@ -296,8 +293,84 @@ def install(
                 print(trans("uninstsuc"))
             else:
                 print(trans("instsuc"))
-            whereisver = rf"{localprograms}\Python\{pythonfolder}"
-            writemanage(pyver, whereisver, "x64", adds, True)
+                writemanage(
+                    pyver,
+                    rf"{localprograms}\Python\{pythonfolder}",
+                    "x64",
+                    adds,
+                    True
+                )
+
+            with open(rf"{homepath}\manage.json") as f:
+                c: dict = load(f)
+
+            if pyver not in c.keys() and uninst:
+                ...
+            elif c == {} or pyver not in c.keys():
+                print(f"\033[0;31m{trans("ferr")}\033[0m")
+                exit(1)
+
+            regk = OpenKey(
+                HKEY_CURRENT_USER,
+                r"Environment",
+                0,
+                KEY_READ | KEY_WRITE
+            )
+
+            try:
+                cpath, dtype = QueryValueEx(regk, "Path")
+
+            except FileNotFoundError:
+                cpath = ""
+                dtype = REG_EXPAND_SZ
+
+            cpathls = cpath.split(";")
+            if "" in cpathls:
+                while cpathls.count("") != 0:
+                    cpathls.remove("")
+
+            ks = list(c.keys())
+            if not uninst:
+                ks.remove(pyver)
+            for k in ks:
+                pstr = c[k]["path"]
+                pscripts = rf"{pstr}\Scripts"
+                while pstr in cpathls or pscripts in cpathls:
+                    if pstr in cpathls and pscripts in cpathls:
+                        cpathls.remove(pstr)
+                        cpathls.remove(pscripts)
+                    elif pstr in cpathls:
+                        cpathls.remove(pstr)
+                    elif pscripts in cpathls:
+                        cpathls.remove(pscripts)
+                    else:
+                        break
+                writemanage(k, pstr, "x64")
+
+            if not uninst:
+                if c[pyver]["path"] in cpathls:
+                    if rf"{c[pyver]["path"]}\Scripts" in cpathls:
+                        ...
+                    else:
+                        cpathls = [rf"{c[v]["path"]}\Scripts"] + cpathls
+                elif rf"{c[pyver]["path"]}\Scripts" in cpathls:
+                    ...
+                else:
+                    cpathls = [c[pyver]["path"], rf"{c[v]["path"]}\Scripts"] + cpathls
+            
+            cpath = ";".join(i for i in cpathls)
+            SetValueEx(regk, "Path", 0, REG_EXPAND_SZ, cpath)
+            CloseKey(regk)
+    
+            if uninst:
+                writemanage(
+                    pyver,
+                    rf"{localprograms}\Python\{pythonfolder}",
+                    "x64",
+                    adds,
+                    True
+                )
+            
             exit(0)
         case 1223 | 1602:
             print(f"\033[0;31m{trans("instcancel")}\033[0m")
@@ -432,7 +505,9 @@ try:
                 print(f"\t(V)\t{trans("instpy")}")
                 print(f"\t(V)t\t{trans("insthread")}")
                 print(f"uninst\t{trans("uninstpy")}")
+                print(f"\t(V)\t{trans("uninstpy")}")
                 print(f"list\t{trans("insted")}")
+                print(f"\t(V)\t{trans("listspec")}")
                 print(f"setdef\t{trans("setdef")}")
                 print(f"setintl\t{trans("setintl")}")
                 print(f"add\t{trans("addpy")}")
@@ -594,7 +669,6 @@ try:
                     " /uninstall",
                     v,
                     f"Python{v.split(".")[0]}{v.split(".")[1]}",
-                    {},
                     None,
                     f"Python {spec}",
                     False,
@@ -610,42 +684,76 @@ try:
                 with open(whereisjson, "r", encoding = "utf-8") as f:
                     c: dict = load(f)
                 if c == {}:
-                    print(f"\033[0;31m{trans("ferr")}\033[0m")
+                    print(f"\033[0;31m{trans("instst")}\033[0m")
                     exit(1)
-                print(trans("lsvap"))
                 s = list(c.keys())
                 s.sort()
 
-                n = 0
-                    
-                for i in s:
+                try:
+                    old = getjson()
+                    v = args[1]
+                    v = old["alias"][v] if v in old["alias"] else v
+
+                    if v not in s:
+                        print(f"\033[0;31m{trans("ferr")}\033[0m")
+                        exit(1)
+
+                    print(trans("lsvap"))
+
                     try:
-                        a = c[i]["arch"]
-                    except KeyError:
+                        a = c[v]["arch"]
+                    except:
                         a = "?"
 
                     try:
-                        p = c[i]["path"]
+                        p = c[v]["path"]
                     except KeyError:
                         p = "?"
 
                     try:
-                        d = f"\033[0;32m{trans("brkdef")}\033[0m" if c[i]["default"] else f"\033[0;31m{trans("brkndef")}\033[0m"
+                        d = f"\033[0;32m{trans("brkdef")}\033[0m" if c[v]["default"] else f"\033[0;31m{trans("brkndef")}\033[0m"
                     except KeyError:
                         d = "?"
 
-                    isdef = c[i]["default"]
-                    
-                    if len(i) > 7:
-                        print(f"{i[:6]}-\t{a}\t{d}\t{p}")
-                        print(i[6:])
+                    if len(v) > 7:
+                        print(f"{v[:6]}-\t{a}\t{d}\t{p}")
+                        print(v[6:])
                     else:
-                        print(f"{i}\t{a}\t{d}\t{p}")
+                        print(f"{v}\t{a}\t{d}\t{p}")
+                    
 
-                    n += 1
+                except IndexError:
+                    print(trans("lsvap"))
+                    n = 0
+                        
+                    for i in s:
+                        try:
+                            a = c[i]["arch"]
+                        except KeyError:
+                            a = "?"
 
-                print(trans("total").format(n))
-                print(trans("ngap"))
+                        try:
+                            p = c[i]["path"]
+                        except KeyError:
+                            p = "?"
+
+                        try:
+                            d = f"\033[0;32m{trans("brkdef")}\033[0m" if c[i]["default"] else f"\033[0;31m{trans("brkndef")}\033[0m"
+                        except KeyError:
+                            d = "?"
+
+                        isdef = c[i]["default"]
+                        
+                        if len(i) > 7:
+                            print(f"{i[:6]}-\t{a}\t{d}\t{p}")
+                            print(i[6:])
+                        else:
+                            print(f"{i}\t{a}\t{d}\t{p}")
+
+                        n += 1
+
+                    print(trans("total").format(n))
+                    print(trans("ngap"))
 
             case "reld":
                 try:
@@ -685,7 +793,7 @@ try:
                         spec = v + trans("brksec")
                     else:
                         spec = v
-                    remove(str(instr), trans("instofpy").format(spec))
+                    remove(instr, trans("instofpy").format(spec))
 
             case "setdef":
                 old = getjson()
@@ -765,7 +873,7 @@ try:
                 old = getjson()
                 try:
                     v = args[1]
-                    p = args[2]
+                    p = expandvars(args[2])
                 except IndexError:
                     print(f"\033[0;31m{trans("invsyn")}\033[0m")
                     exit(1)
@@ -803,7 +911,7 @@ try:
                 if ol is None:
                     ol = "default"
 
-                actual = l if l is not None else "en_US"
+                actual = l if l is not None else loc
 
                 print(f"{trans("setintlsuc", actual).format(Ol)} {ol})")
             
