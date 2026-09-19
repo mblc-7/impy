@@ -21,7 +21,7 @@ homepath = rf"{localprograms}\ImPy"
 mkdir(homepath)
 setups = rf"{homepath}\python"
 mkdir(setups)
-impt = "26.1.7d1"
+impt = "26.1.7"
 cincl = ["Python 3.14.7", "Inno Setup 7.1.0", "CL 19.51.36257"]
 config = rf"{homepath}\config.json"
 

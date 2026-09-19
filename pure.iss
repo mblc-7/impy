@@ -1,7 +1,7 @@
 [Setup]
 AppName=ImPy
-AppVersion=26.1.7d1
-VersionInfoVersion=26.1.7.1
+AppVersion=26.1.7
+VersionInfoVersion=26.1.7.0
 AppPublisher=MBLC7
 AppCopyright=Copyright (C) 2026 MBLC7
 DefaultDirName={localappdata}\Programs\ImPy\client
@@ -15,7 +15,7 @@ ChangesEnvironment=yes
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=lowest
-SetupIconFile=impy-dev.ico
+SetupIconFile=impy.ico
 UninstallDisplayIcon={app}\impy.exe
 
 [Languages]
