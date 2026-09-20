@@ -24,27 +24,27 @@ Name: "zh_CN"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 Name: "zh_TW"; MessagesFile: "compiler:Languages\ChineseTraditional.isl"
 
 [CustomMessages]
-en.FullInstallation=Full Installation
+en_US.FullInstallation=Full Installation
 zh_CN.FullInstallation=完整安装
 zh_TW.FullInstallation=完整安裝
 
-en.CompactInstallation=Compact Installation
+en_US.CompactInstallation=Compact Installation
 zh_CN.CompactInstallation=精简安装
 zh_TW.CompactInstallation=精簡安裝
 
-en.CustomInstallation=Custom Installation
+en_US.CustomInstallation=Custom Installation
 zh_CN.CustomInstallation=自定义安装
 zh_TW.CustomInstallation=自訂安裝
 
-en.ImPymainsource=ImPy main source
+en_US.ImPymainsource=ImPy main source
 zh_CN.ImPymainsource=ImPy 主程序
 zh_TW.ImPymainsource=ImPy 主程式
 
-en.ImPybuildsource=ImPy build source
+en_US.ImPybuildsource=ImPy build source
 zh_CN.ImPybuildsource=ImPy 构建源码
 zh_TW.ImPybuildsource=ImPy 建置源碼
 
-en.UninstallImPy=Uninstall ImPy
+en_US.UninstallImPy=Uninstall ImPy
 zh_CN.UninstallImPy=卸载 ImPy
 zh_TW.UninstallImPy=解除安裝 ImPy
 

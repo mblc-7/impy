@@ -24,7 +24,7 @@ Name: "zh_CN"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 Name: "zh_TW"; MessagesFile: "compiler:Languages\ChineseTraditional.isl"
 
 [CustomMessages]
-en.UninstallImPy=Uninstall ImPy
+en_US.UninstallImPy=Uninstall ImPy
 zh_CN.UninstallImPy=卸载 ImPy
 zh_TW.UninstallImPy=解除安裝 ImPy
 
