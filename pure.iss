@@ -1,7 +1,7 @@
 [Setup]
 AppName=ImPy
-AppVersion=26.1.7
-VersionInfoVersion=26.1.7.0
+AppVersion=26.1.8
+VersionInfoVersion=26.1.8.0
 AppPublisher=MBLC7
 AppCopyright=Copyright (C) 2026 MBLC7
 DefaultDirName={localappdata}\Programs\ImPy\client
@@ -19,7 +19,7 @@ SetupIconFile=impy.ico
 UninstallDisplayIcon={app}\impy.exe
 
 [Languages]
-Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "en_US"; MessagesFile: "compiler:Default.isl"
 Name: "zh_CN"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 Name: "zh_TW"; MessagesFile: "compiler:Languages\ChineseTraditional.isl"
 
@@ -27,7 +27,6 @@ Name: "zh_TW"; MessagesFile: "compiler:Languages\ChineseTraditional.isl"
 en.UninstallImPy=Uninstall ImPy
 zh_CN.UninstallImPy=卸载 ImPy
 zh_TW.UninstallImPy=解除安裝 ImPy
-
 
 [Files]
 Source: "impy.dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs

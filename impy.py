@@ -21,7 +21,7 @@ homepath = rf"{localprograms}\ImPy"
 mkdir(homepath)
 setups = rf"{homepath}\python"
 mkdir(setups)
-impt = "26.1.7"
+impt = "26.1.8"
 cincl = ["Python 3.14.7", "Inno Setup 7.1.0", "CL 19.51.36257"]
 config = rf"{homepath}\config.json"
 
@@ -73,7 +73,7 @@ match (v.major, v.minor, v.build):
     case (5, 1, _) | (5, 2, _):
         print(f"\033[0;33m{trans("unsupport")} Windows XP\033[0m")
     case (6, 0, _):
-        print(f"\033[0;33m{trans("unsupport")} Windows Vista\033[0m")
+        print("\033[0;33m{} Windows {}\033[0m".format(trans("unsupport"), "Longhorn" if v.build < 5219 else "Vista"))
     case (6, 1, _):
         print(f"\033[0;33m{trans("unsupport")} Windows 7\033[0m")
     case (6, 2, _):
@@ -81,9 +81,10 @@ match (v.major, v.minor, v.build):
     case (6, 3, _):
         print(f"\033[0;33m{trans("unsupport")} Windows 8.1\033[0m")
     case (6, 4, _):
-        print(f"\033[0;33m{trans("unsupport")} Windows 10\033[0m")
+        print(f"\033[0;33m{trans("unsupport")} Windows Technical Preview\033[0m")
     case (10, 0, _):
-        pass
+        if v.build < 22621:
+            print("\033[0;33m{} Windows {}\033[0m".format(trans("unsupport"), "Technical Preview" if v.build < 9915 else "10" if v.build < 19045 else "11"))
     case _:
         print(f"\033[0;31m{trans("winverinvalid")}\033[0m")
         exit(1)
@@ -352,7 +353,7 @@ def install(
                     if rf"{c[pyver]["path"]}\Scripts" in cpathls:
                         ...
                     else:
-                        cpathls = [rf"{c[v]["path"]}\Scripts"] + cpathls
+                        cpathls = [rf"{c[pyver]["path"]}\Scripts"] + cpathls
                 elif rf"{c[pyver]["path"]}\Scripts" in cpathls:
                     ...
                 else:
@@ -702,7 +703,7 @@ try:
 
                     try:
                         a = c[v]["arch"]
-                    except:
+                    except KeyError:
                         a = "?"
 
                     try:
