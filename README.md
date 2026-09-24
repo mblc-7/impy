@@ -17,7 +17,7 @@ Make Python easy to manage
 
 * [Release History](https://github.com/mblc-7/impy/wiki/Releases-History)
 * [Self Compile Guide](https://github.com/mblc-7/impy/wiki/Self-Compile-Guide)
-* [Difference between Full Setup and Pure Setup](https://github.com/mblc-7/impy/wiki/Difference-between-Full-Setup-and-Pure-Setup)
+* [Difference between Full Setup and Pure Setup](https://github.com/mblc-7/impy/wiki/Difference-between-Full-Setup-and-Pure-Setup) (for versions before 26.1.9)
 
 ## Language Supports
 
