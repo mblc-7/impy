@@ -150,9 +150,9 @@
     },
 
     "threadnote": {
-        "zh_CN": "自由线程仅支持 Python 3.13+",
-        "zh_TW": "自由綫程僅支持 Python 3.13+",
-        "en_US": "Free-threaded is only on Python 3.13+"
+        "zh_CN": "自由线程仅支持 Python 3.13.0a4+",
+        "zh_TW": "自由綫程僅支持 Python 3.13.0a4+",
+        "en_US": "Free-threaded is only on Python 3.13.0a4+"
     },
 
     "ifaild": {
@@ -234,9 +234,9 @@
     },
 
     "insthread": {
-        "zh_CN": "安装包含自由线程的 Python (仅限 Python 3.13+)",
-        "zh_TW": "安裝包含自由綫程的 Python (僅限 Python 3.13+)",
-        "en_US": "Install Python with free-threaded build (only for Python 3.13+)"
+        "zh_CN": "安装包含自由线程的 Python (仅限 Python 3.13.0a4+)",
+        "zh_TW": "安裝包含自由綫程的 Python (僅限 Python 3.13.0a4+)",
+        "en_US": "Install Python with free-threaded build (only for Python 3.13.0a4+)"
     },
 
     "uninstpy": {
@@ -495,5 +495,11 @@
         "zh_CN": "特定一个已安装的 Python 的信息",
         "zh_TW": "特定一個已安裝的 Python 的訊息",
         "en_US": "Specific one installed Python's informations"
+    },
+    
+    "unsarchx": {
+        "zh_CN": "不支持的架构！",
+        "zh_TW": "不支援的架構！",
+        "en_US": "Unsupport architecture!"
     }
 }

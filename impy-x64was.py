@@ -155,7 +155,7 @@ def writemanage(
             with open(whereisjson, "w", encoding = "utf-8") as f:
                 dump({}, f, indent = 4)
 
-def getjson(jsonnm: str = "versions.json"):
+def getjson(jsonnm: str = "versions-arm64.json"):
     where = rf"{homepath}\{jsonnm}"
     wjson = f"{homeurl}/{jsonnm}"
     if PathFileExistsW(L(where)):
@@ -408,7 +408,7 @@ def build_args(argv: list) -> str:
     return " ".join(parts)
 
 def run_python(exe_template: str, freethread: bool = False, use_pythonw: bool = False) -> None:
-    where = rf"{homepath}\versions.json"
+    where = rf"{homepath}\versions-arm64.json"
     if not PathFileExistsW(L(where)):
         old = getjson()
     else:
@@ -523,7 +523,7 @@ try:
                 impt_c = impt
                 if randint(0, 15) == 7:
                     impt_c = impt_c.replace("9", "6")
-                print(f"ImPy {impt_c} x64\n[{", ".join(cincl)}]\n{trans("copy")}\n{impyascii}")
+                print(f"ImPy {impt_c} x64WAS (With ARM64 Setups)\n[{", ".join(cincl)}]\n{trans("copy")}\n{impyascii}")
 
             case "upd":
                 old = getjson()
@@ -629,7 +629,7 @@ try:
                     else:
                         spec = v
 
-                    insturl = getjson("route.json")["python"][v]
+                    insturl = getjson("route-arm64.json")["python"][v]
                     install(
                         insturl,
                         shouldfn,
@@ -666,7 +666,7 @@ try:
                 else:
                     spec = v
 
-                insturl = getjson("route.json")["python"][v]
+                insturl = getjson("route-arm64.json")["python"][v]
                 install(
                     insturl,
                     shouldfn,
@@ -763,7 +763,7 @@ try:
                 try:
                     getjson("update.json")
                     getjson()
-                    getjson("route.json")
+                    getjson("route-arm64.json")
 
                     print(trans("relsuc"))
 
@@ -777,7 +777,7 @@ try:
                 run_python("pythonw.exe", use_pythonw = True)
 
             case "del":
-                where = rf"{homepath}\versions.json"
+                where = rf"{homepath}\versions-arm64.json"
                 if not PathFileExistsW(L(where)):
                     old = getjson()
                 else:

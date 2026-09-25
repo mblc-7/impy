@@ -6,6 +6,6 @@ echo *                   *
 echo.
 echo TIP: Everytime before enter commands, add "impy " at the front!
 echo.
-impy help
+impy-x64was help
 cd /d "%~dp0"
 echo.
