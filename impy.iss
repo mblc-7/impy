@@ -1,7 +1,7 @@
 [Setup]
 AppName=ImPy on x64
-AppVersion=26.1.9
-VersionInfoVersion=26.1.9.0
+AppVersion=26.1.10
+VersionInfoVersion=26.1.10.0
 AppPublisher=MBLC7
 AppCopyright=Copyright (C) 2026 MBLC7
 DefaultDirName={localappdata}\Programs\ImPy\client

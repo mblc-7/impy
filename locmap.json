@@ -149,6 +149,12 @@
         "en_US": "Invalid syntax! If you need some help, try \"impy help\"!"
     },
 
+    "invsynwas": {
+        "zh_CN": "无效语法！如果您需要帮助，请尝试 \"impy-x64was help\" ！",
+        "zh_TW": "無效語法！如果您需要幫助，請嘗試 \"impy-x64was help\" ！",
+        "en_US": "Invalid syntax! If you need some help, try \"impy-x64was help\"!"
+    },
+
     "threadnote": {
         "zh_CN": "自由线程仅支持 Python 3.13.0a4+",
         "zh_TW": "自由綫程僅支持 Python 3.13.0a4+",
@@ -189,6 +195,12 @@
         "zh_CN": "不能是空的！如果您需要帮助，请尝试 \"impy help\" ！",
         "zh_TW": "不能是空的！如果您需要幫助，請嘗試 \"impy help\" ！",
         "en_US": "Cannot be empty, if you need some help, try \"impy help\"!"
+    },
+
+    "cantemptywas": {
+        "zh_CN": "不能是空的！如果您需要帮助，请尝试 \"impy-x64was help\" ！",
+        "zh_TW": "不能是空的！如果您需要幫助，請嘗試 \"impy-x64was help\" ！",
+        "en_US": "Cannot be empty, if you need some help, try \"impy-x64was help\"!"
     },
 
     "showcmd": {
@@ -377,6 +389,12 @@
         "en_US": "Unknown version! Try \"impy reld\" to fetch latest version updates or get available version list by \"impy inst help\"!"
     },
 
+    "unkverwas": {
+        "zh_CN": "未知版本！请尝试 \"impy-x64was reld\" 来获取最新信息或 \"impy-x64was inst help\" 来获取所有可用版本列表！",
+        "zh_TW": "未知版本！請嘗試 \"impy-x64was reld\" 來獲取最新訊息或 \"impy-x64was inst help\" 來獲取所有可用版本列表！",
+        "en_US": "Unknown version! Try \"impy-x64was reld\" to fetch latest version updates or get available version list by \"impy-x64was inst help\"!"
+    },
+
     "lsvap": {
         "zh_CN": "版本\t架构\t默认\t路径\n-------\t----\t-------\t----",
         "zh_TW": "版本\t架構\t默認\t路徑\n-------\t----\t-------\t----",
@@ -435,6 +453,12 @@
         "zh_CN": "不可以创建一个无窗口的自由线程构建！请尝试 \"impy py {}\" ！",
         "zh_TW": "不可以創建一個無窗口的自由綫程構建！請嘗試 \"impy py {}\" ！",
         "en_US": "Cannot create free-threaded build with no window! Try \"impy py {}\"!"
+    },
+
+    "pywterrwas": {
+        "zh_CN": "不可以创建一个无窗口的自由线程构建！请尝试 \"impy-x64was py {}\" ！",
+        "zh_TW": "不可以創建一個無窗口的自由綫程構建！請嘗試 \"impy-x64was py {}\" ！",
+        "en_US": "Cannot create free-threaded build with no window! Try \"impy-x64was py {}\"!"
     },
 
     "total": {

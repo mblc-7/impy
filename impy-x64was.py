@@ -9,7 +9,7 @@ from json import dump, load, JSONDecodeError
 from os.path import expandvars
 from random import randint
 
-stdout.reconfigure(line_buffering = True)
+stdout.reconfigure(encoding = "utf-8", line_buffering = True)
 
 def mkdir(path) -> None:
     if PathFileExistsW(L(path)):
@@ -22,14 +22,13 @@ homepath = rf"{localprograms}\ImPy"
 mkdir(homepath)
 setups = rf"{homepath}\python"
 mkdir(setups)
-impt = "26.1.9"
+impt = "26.1.10"
 cincl = ["Python 3.14.7", "Inno Setup 7.1.0", "CL 19.51.36257"]
 config = rf"{homepath}\config.json"
 
 if not PathFileExistsW(L(config)):
     with open(config, "w") as f:
         dump({"lang": None}, f, indent = 4)
-        
 
 with open(config, "r") as f:
     configcontent: dict = load(f)
@@ -420,12 +419,12 @@ def run_python(exe_template: str, freethread: bool = False, use_pythonw: bool = 
         freethread = freethread if freethread else v.endswith("t")
         if use_pythonw:
             if freethread:
-                print(f"\033[0;31m{trans("pywterr").format(v)}\033[0m")
+                print(f"\033[0;31m{trans("pywterrwas").format(v)}\033[0m")
                 exit(1)
         exe_template = "python{v0}.{v1}t.exe" if freethread else exe_template
         v = v.removesuffix("t") if v.endswith("t") else v
     except IndexError:
-        print(f"\033[0;31m{trans("invsyn")}\033[0m")
+        print(f"\033[0;31m{trans("invsynwas")}\033[0m")
         exit(1)
 
     v = old["alias"][v] if v in old["alias"] else v
@@ -434,7 +433,7 @@ def run_python(exe_template: str, freethread: bool = False, use_pythonw: bool = 
         if v not in old["freethread"]:
             print(f"\033[0;31m{trans("threadnote")}\033[0m")
             exit(1)
-        print(f"\033[0;33m{trans("ifaild")} \"impy inst {args[1].removesuffix("t")}t\" {trans("modit")}\033[0m")
+        print(f"\033[0;33m{trans("ifaild")} \"impy-x64was inst {args[1].removesuffix("t")}t\" {trans("modit")}\033[0m")
 
     whereisjson = rf"{homepath}\manage.json"
     if not PathFileExistsW(L(whereisjson)):
@@ -490,7 +489,7 @@ def run_python(exe_template: str, freethread: bool = False, use_pythonw: bool = 
 try:
     if __name__ == "__main__":
         if args == []:
-            print(f"\033[0;31m{trans("cantempty")}\033[0m")
+            print(f"\033[0;31m{trans("cantemptywas")}\033[0m")
             exit(1)
 
         match args[0]:
@@ -513,20 +512,20 @@ try:
                 print(f"add\t{trans("addpy")}")
                 print(f"del\t{trans("rminst")}")
                 print(f"\t(V)\t{trans("rminst")}")
-                print(f"py\t{trans("runpy")} ({trans("like")} \"impy py 3.14 main.py\")")
+                print(f"py\t{trans("runpy")} ({trans("like")} \"impy-x64was py 3.14 main.py\")")
                 print(f"\t(V)\t{trans("runpy")}")
                 print(f"\t(V)t\t{trans("runpyt")}")
-                print(f"pyw\t{trans("runpyw")} ({trans("like")} \"impy pyw 3.14 main.py\")")
+                print(f"pyw\t{trans("runpyw")} ({trans("like")} \"impy-x64was pyw 3.14 main.py\")")
                 print(f"\t(V)\t{trans("runpyw")}")
 
             case "about":
                 impt_c = impt
-                if randint(0, 15) == 7:
-                    impt_c = impt_c.replace("9", "6")
+                if randint(0, 24) == 7:
+                    impt_c = impt_c.replace("10", "X")
                 print(f"ImPy {impt_c} x64WAS (With ARM64 Setups)\n[{", ".join(cincl)}]\n{trans("copy")}\n{impyascii}")
 
             case "upd":
-                old = getjson()
+                old = getjson("update.json")
                 match impt:
                     case x if x == old["update"]["dev"]:
                         print(f"\033[1;36m‼ {trans("future")} ({trans("build")} {x})\033[0m")
@@ -545,7 +544,7 @@ try:
                 try:
                     a = args[1]
                 except IndexError:
-                    print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                    print(f"\033[0;31m{trans("invsynwas")}\033[0m")
                     exit(1)
                 if a == "help":
                     try:
@@ -602,7 +601,7 @@ try:
                     try:
                         v = args[1]
                     except IndexError:
-                        print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                        print(f"\033[0;31m{trans("invsynwas")}\033[0m")
                         exit(1)
                     tswit = v.endswith("t")
                     v = v.removesuffix("t") if v.endswith("t") else v
@@ -610,7 +609,7 @@ try:
 
                     v = old["alias"][v] if v in old["alias"] else v
                     if v not in syn:
-                        print(f"\033[0;31m{trans("unkver")}\033[0m")
+                        print(f"\033[0;31m{trans("unkverwas")}\033[0m")
                         exit(1)
                     shouldfn = rf"{setups}\python-{v}-amd64.exe"
                     try:
@@ -647,7 +646,7 @@ try:
                 try:
                     v = args[1]
                 except IndexError:
-                    print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                    print(f"\033[0;31m{trans("invsynwas")}\033[0m")
                     exit(1)
                 tswit = v.endswith("t")
                 v = v.removesuffix("t") if v.endswith("t") else v
@@ -655,7 +654,7 @@ try:
 
                 v = old["alias"][v] if v in old["alias"] else v
                 if v not in syn:
-                    print(f"\033[0;31m{trans("unkver")}\033[0m")
+                    print(f"\033[0;31m{trans("unkverwas")}\033[0m")
                     exit(1)
                 shouldfn = rf"{setups}\python-{v}-amd64.exe"
 
@@ -786,7 +785,7 @@ try:
                 try:
                     v = args[1]
                 except IndexError:
-                    print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                    print(f"\033[0;31m{trans("invsynwas")}\033[0m")
                     exit(1)
 
                 v = old["alias"][v] if v in old["alias"] else v
@@ -812,7 +811,7 @@ try:
                 try:
                     v = args[1]
                 except IndexError:
-                    print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                    print(f"\033[0;31m{trans("invsynwas")}\033[0m")
                     exit(1)
 
                 v = old["alias"][v] if v in old["alias"] else v
@@ -882,7 +881,7 @@ try:
                     v = args[1]
                     p = expandvars(args[2])
                 except IndexError:
-                    print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                    print(f"\033[0;31m{trans("invsynwas")}\033[0m")
                     exit(1)
 
                 try:
@@ -911,7 +910,7 @@ try:
                 try:
                     l = args[1]
                 except IndexError:
-                    print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                    print(f"\033[0;31m{trans("invsynwas")}\033[0m")
                     exit(1)
 
                 ol = configcontent["lang"]
@@ -935,7 +934,7 @@ try:
                 print(f"{trans("setintlsuc", actual).format(Ol)} {ol})")
             
             case _:
-                print(f"\033[0;31m{trans("invsyn")}\033[0m")
+                print(f"\033[0;31m{trans("invsynwas")}\033[0m")
                 exit(1)
 
 except KeyboardInterrupt:

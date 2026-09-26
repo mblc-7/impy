@@ -9,7 +9,7 @@ from json import dump, load, JSONDecodeError
 from os.path import expandvars
 from random import randint
 
-stdout.reconfigure(line_buffering = True)
+stdout.reconfigure(encoding = "utf-8", line_buffering = True)
 
 def mkdir(path) -> None:
     if PathFileExistsW(L(path)):
@@ -22,14 +22,13 @@ homepath = rf"{localprograms}\ImPy"
 mkdir(homepath)
 setups = rf"{homepath}\python"
 mkdir(setups)
-impt = "26.1.9"
+impt = "26.1.10"
 cincl = ["Python 3.14.7", "Inno Setup 7.1.0", "CL 19.51.36257"]
 config = rf"{homepath}\config.json"
 
 if not PathFileExistsW(L(config)):
     with open(config, "w") as f:
         dump({"lang": None}, f, indent = 4)
-        
 
 with open(config, "r") as f:
     configcontent: dict = load(f)
@@ -521,12 +520,12 @@ try:
 
             case "about":
                 impt_c = impt
-                if randint(0, 15) == 7:
-                    impt_c = impt_c.replace("9", "6")
+                if randint(0, 24) == 7:
+                    impt_c = impt_c.replace("10", "X")
                 print(f"ImPy {impt_c} x64\n[{", ".join(cincl)}]\n{trans("copy")}\n{impyascii}")
 
             case "upd":
-                old = getjson()
+                old = getjson("update.json")
                 match impt:
                     case x if x == old["update"]["dev"]:
                         print(f"\033[1;36m‼ {trans("future")} ({trans("build")} {x})\033[0m")
